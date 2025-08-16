@@ -7,7 +7,7 @@ async function initWasm() {
     const result = await WebAssembly.instantiate(buf, go.importObject);
     mod = result.module;
     inst = result.instance;
-    
+
     // Start the Go runtime (long-running)
     go.run(inst);
 
@@ -18,18 +18,18 @@ async function initWasm() {
 initWasm();
 
 document.getElementById("runBtn").addEventListener("click", async () => {
-    
-const code = `
+    // Wrap user code into a full Go program
+    const code = `
 package main
 import "fmt"
 func main() {
 ${document.getElementById("code").value}
 }`;
+
     const outputEl = document.getElementById("output");
     outputEl.textContent = "";
 
     try {
-        // Call the Go function exposed from main.go
         const result = runYaegi(code);
         outputEl.textContent = result;
     } catch (err) {
