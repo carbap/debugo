@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Remove default scrollbars */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    /* prevents browser scroll */
+}
+
+/* Use full viewport for the layout */
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e2f;
+    color: #e0e0e0;
+}
+
+#topContainer {
+    height: 15%;
+    min-height: 15%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+
+    /* --- Title --- */
+    h1 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #ffcc66;
+        text-align: center;
+    }
+
+    /* --- Run Button --- */
+    #runBtn {
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 500;
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        display: block;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+}
+
+@media (max-width: 600px),
+(max-height: 500px) {
+    #topContainer h1 {
+        display: none;
+    }
+}
+
+#runBtn:hover {
+    background-color: #66bb6a;
+}
+
+/* Split container */
+#splitContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 85%;
+}
+
+/* --- Monaco Editor Container --- */
+#editor {
+    height: 61.8%;
+    min-height: 10%;
+    width: 100%;
+    overflow: hidden;
+}
+
+#outputDiv {
+    height: 38.2%;
+    min-height: 10%;
+}
+
+/* --- Output --- */
+#output {
+    height: 100%;
+    margin: 0;
+    padding: 10px;
+    background: #2e2e3e;
+    font-family: 'Fira Code', monospace;
+    color: #f0f0f0;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+/* Optional: smooth scrollbar for output */
+#output::-webkit-scrollbar {
+    width: 8px;
+}
+
+#output::-webkit-scrollbar-thumb {
+    background-color: #666;
+}
+
+/* Resizer */
+#resizer {
+    height: 8px;
+    background: #555;
+    cursor: row-resize;
+    transition: background 0.3s;
+}
+
+#resizer:hover {
+    background: #ffcc66;
+    /* highlight on hover */
+}
