@@ -23,14 +23,14 @@ func main() {
         stderr := &bytes.Buffer{}
 
         // Fresh interpreter instance for every run
-        i := interp.New(interp.Options{
+        interpreter := interp.New(interp.Options{
             Stdout: stdout,
             Stderr: stderr,
         })
-        i.Use(stdlib.Symbols)
+        interpreter.Use(stdlib.Symbols)
 
         // Evaluate user code
-        _, err := i.Eval(code)
+        _, err := interpreter.Eval(code)
         if err != nil {
             return err.Error()
         }
@@ -39,45 +39,65 @@ func main() {
     }))
 
     js.Global().Set("runYaegiDebug", js.FuncOf(func(this js.Value, args []js.Value) any {
-        if len(args) < 2 {
-            return "missing code or breakpoints"
+        if len(args) != 2 {
+            return "missing code and breakpoints"
         }
         code := args[0].String()
-        // breakpointsJS := args[1]
+        uiBreakpoints := args[1]
+        if !uiBreakpoints.InstanceOf(js.Global().Get("Array")) {
+            return "breakpoints must be an array"
+        }
 
         stdout := &bytes.Buffer{}
         stderr := &bytes.Buffer{}
 
-        i := interp.New(interp.Options{
+        interpreter := interp.New(interp.Options{
             Stdout: stdout,
             Stderr: stderr,
         })
-        i.Use(stdlib.Symbols)
+        interpreter.Use(stdlib.Symbols)
 
-		prog, err := i.Compile(code)
+		prog, err := interpreter.Compile(code)
 		if err != nil {
 			return err.Error()
 		}
 
         ctx := context.Background()
         events := func(e *interp.DebugEvent) {
-            fmt.Println("Debug event:", e.Reason())
+            fmt.Println("debug event:", e.Reason())
         }
         var opts *interp.DebugOptions = nil
-		debugger := i.Debug(ctx, prog, events, opts)
+		debugger := interpreter.Debug(ctx, prog, events, opts)
 
-		debugger.SetBreakpoints(interp.AllBreakpointTarget(), interp.FunctionBreakpoint("main"));
+        breakpointTarget := interp.ProgramBreakpointTarget(prog);
+        var breakpointRequests []interp.BreakpointRequest
+        for i := 0; i < uiBreakpoints.Length(); i++ {
+            lineNumber := uiBreakpoints.Index(i).Int()            
+            breakpointRequests = append(breakpointRequests, interp.LineBreakpoint(lineNumber))
+            fmt.Println("breakpoint", i, "on line", lineNumber)
+        }
+		breakpoints := debugger.SetBreakpoints(breakpointTarget, breakpointRequests...);
 
-		// Start execution until first breakpoint
+        for i, bp := range breakpoints {
+            if bp.Valid {
+                fmt.Println("valid breakpoint", i, "set at", bp.Position)
+            } else {
+                fmt.Println("invalid breakpoint", i)
+            }
+        }
+
 		if err := debugger.Continue(0); err != nil {
+            fmt.Println("error when starting debug")
 			return err.Error()
 		}
+        fmt.Println("started debugging")
 
-		// Expose continue function to JavaScript
-		js.Global().Set("continueDebug", js.FuncOf(func(this js.Value, p []js.Value) any {
+		js.Global().Set("continueYaegiDebug", js.FuncOf(func(this js.Value, p []js.Value) any {
 			if err := debugger.Continue(0); err != nil {
+                fmt.Println("error when continuing debug")
 				return err.Error()
 			}
+            fmt.Println("continued debugging")
 			return stdout.String()
 		}))
 

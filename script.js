@@ -84,14 +84,14 @@ window.addEventListener('resize', () => {
 
 
 document.getElementById("debugBtn").addEventListener("click", () => {
-    const breakpoints = window.getBreakpoints();
     const code = window.editor.getValue();
+    const breakpoints = window.getBreakpoints();
     const output = runYaegiDebug(code, breakpoints);
     document.getElementById("output").textContent = output;
 });
 
 document.getElementById("continueBtn").addEventListener("click", () => {
-    const output = continueDebug();
+    const output = continueYaegiDebug();
     document.getElementById("output").textContent = output;
 });
 
