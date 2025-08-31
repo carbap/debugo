@@ -1,5 +1,37 @@
+
+
+const checkResult = (result) => {
+    if (result.error != "") {
+        console.log(result.error);
+        return false;
+    }
+    return true;
+}
+
 const go = new Go(); // from wasm_exec.js
 let mod, inst;
+
+const runBtn = document.getElementById("runBtn");
+const debugBtn = document.getElementById("debugBtn");
+const continueBtn = document.getElementById("continueBtn");
+
+function reset() {
+    runBtn.disabled = false;
+    debugBtn.disabled = false;
+    continueBtn.disabled = true;
+}
+window.reset = reset;
+
+function resetOutput() {
+    output.textContent = "";
+}
+
+function setDebug() {
+    runBtn.disabled = true;
+    debugBtn.disabled = true;
+    continueBtn.disabled = false;
+    resetOutput();
+}
 
 async function initWasm() {
     const resp = await fetch("yaegi.wasm");
@@ -11,29 +43,34 @@ async function initWasm() {
     // Start the Go runtime (long-running)
     go.run(inst);
 
-    document.getElementById("runBtn").disabled = false;
+    reset();
     console.log("Yaegi ready");
 }
 
 initWasm();
 
-document.getElementById("runBtn").addEventListener("click", async () => {
+runBtn.addEventListener("click", async () => {
     const code = window.editor.getValue();
-    const outputEl = document.getElementById("output");
-    outputEl.textContent = "";
-
+    resetOutput();
+    let content = null;
     try {
         const result = runYaegi(code);
-        outputEl.textContent = result;
-    } catch (err) {
-        outputEl.textContent = "Error: " + err;
+        if (!checkResult(result)) {
+            content = result.error;
+        } else {
+            content = result.output;
+        }
+    } catch (ex) {
+        content = ex
     }
+    output.textContent = content;
 });
 
 const splitContainer = document.getElementById('splitContainer');
 const editor = document.getElementById('editor');
 const resizer = document.getElementById('resizer');
-const output = document.getElementById('outputDiv');
+const outputDiv = document.getElementById('outputDiv');
+const output = document.getElementById('output');
 
 let isResizing = false;
 let lastEditorRatio = 0.618;
@@ -61,7 +98,7 @@ document.addEventListener('mousemove', (e) => {
     }
 
     editor.style.height = `${newEditorHeight}px`;
-    output.style.height = `${newOutputHeight}px`;
+    outputDiv.style.height = `${newOutputHeight}px`;
 
     lastEditorRatio = newEditorHeight / containerHeight;
 });
@@ -79,20 +116,25 @@ window.addEventListener('resize', () => {
     const newOutputHeight = containerHeight - newEditorHeight - resizer.offsetHeight;
 
     editor.style.height = `${newEditorHeight}px`;
-    output.style.height = `${newOutputHeight}px`;
+    outputDiv.style.height = `${newOutputHeight}px`;
 });
 
 
-document.getElementById("debugBtn").addEventListener("click", () => {
+debugBtn.addEventListener("click", () => {
+    setDebug();
     const code = window.editor.getValue();
     const breakpoints = [...window.breakpoints];
-    const output = startYaegiDebug(code, breakpoints);
-    document.getElementById("output").textContent = output;
+    const result = startYaegiDebug(code, breakpoints);
+    if (!checkResult(result)) {
+        output.textContent += result.error;
+    }
 });
 
-document.getElementById("continueBtn").addEventListener("click", () => {
-    const output = continueYaegiDebug();
-    document.getElementById("output").textContent = output;
+continueBtn.addEventListener("click", () => {
+    const result = continueYaegiDebug();
+    if (!checkResult(result)) {
+        output.textContent += result.error;
+    }
 });
 
 const DebugEventReason = {
@@ -112,9 +154,11 @@ const DebugEventReasonName = Object.fromEntries(
     Object.entries(DebugEventReason).map(([k, v]) => [v, k])
 );
 
-window.onDebugEvent = function (reason) {
+window.onDebugEvent = function (reason, stdout) {
     console.log(DebugEventReasonName[reason]);
+    if (reason == DebugEventReason.DebugTerminate) {
+        reset();
+        return;
+    }
+    output.textContent = stdout;
 };
-
-
-

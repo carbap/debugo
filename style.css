@@ -50,7 +50,14 @@ body {
         display: block;
         cursor: pointer;
         border-radius: 6px;
-        transition: background 0.3s;
+        transition: background 0.2s;
+    }
+    .executionBtn:hover {
+        background-color: #66bb6a;
+    }
+    .executionBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 
@@ -59,10 +66,6 @@ body {
     #topContainer h1 {
         display: none;
     }
-}
-
-.executionBtn:hover {
-    background-color: #66bb6a;
 }
 
 /* Split container */
