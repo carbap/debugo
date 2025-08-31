@@ -85,8 +85,8 @@ window.addEventListener('resize', () => {
 
 document.getElementById("debugBtn").addEventListener("click", () => {
     const code = window.editor.getValue();
-    const breakpoints = window.getBreakpoints();
-    const output = runYaegiDebug(code, breakpoints);
+    const breakpoints = [...window.breakpoints];
+    const output = startYaegiDebug(code, breakpoints);
     document.getElementById("output").textContent = output;
 });
 
@@ -94,5 +94,27 @@ document.getElementById("continueBtn").addEventListener("click", () => {
     const output = continueYaegiDebug();
     document.getElementById("output").textContent = output;
 });
+
+const DebugEventReason = {
+    debugRun: 0,
+    DebugPause: 1,
+    DebugBreak: 2,
+    DebugEntry: 3,
+    DebugStepInto: 4,
+    DebugStepOver: 5,
+    DebugStepOut: 6,
+    DebugTerminate: 7,
+    DebugEnterGoRoutine: 8,
+    DebugExitGoRoutine: 9
+};
+
+const DebugEventReasonName = Object.fromEntries(
+    Object.entries(DebugEventReason).map(([k, v]) => [v, k])
+);
+
+window.onDebugEvent = function (reason) {
+    console.log(DebugEventReasonName[reason]);
+};
+
 
 
