@@ -81,3 +81,18 @@ window.addEventListener('resize', () => {
     editor.style.height = `${newEditorHeight}px`;
     output.style.height = `${newOutputHeight}px`;
 });
+
+
+document.getElementById("debugBtn").addEventListener("click", () => {
+    const breakpoints = window.getBreakpoints();
+    const code = window.editor.getValue();
+    const output = runYaegiDebug(code, breakpoints);
+    document.getElementById("output").textContent = output;
+});
+
+document.getElementById("continueBtn").addEventListener("click", () => {
+    const output = continueDebug();
+    document.getElementById("output").textContent = output;
+});
+
+
