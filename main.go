@@ -20,8 +20,17 @@ var stderr *bytes.Buffer
 
 func main() {
     js.Global().Set("runYaegi", js.FuncOf(func(this js.Value, args []js.Value) any {
+        result := map[string]any{
+            "error":   "",
+            "output":  "",
+        }
+        if isDebugging() {
+            result["error"] = "can't run while debugging"
+            return js.ValueOf(result)
+        }
         if len(args) < 1 {
-            return "no code provided"
+            result["error"] = "no code provided"
+            return js.ValueOf(result)
         }
         code := args[0].String()
 
@@ -36,20 +45,34 @@ func main() {
 
         _, err = interpreter.Eval(code)
         if err != nil {
-            return err.Error()
+            result["error"] = err.Error()
+            return js.ValueOf(result)
         }
 
-        return stdout.String()
+        fmt.Println("ran code");
+        result["output"] = stdout.String()
+        return js.ValueOf(result)
     }))
 
     js.Global().Set("startYaegiDebug", js.FuncOf(func(this js.Value, args []js.Value) any {
-        if len(args) != 2 {
-            return "missing code and breakpointLineNumbers arguments"
+        result := map[string]any{
+            "error":   "",
+            "output":  "",
         }
+        if isDebugging() {
+            result["error"] = "already debugging"
+            return js.ValueOf(result)
+        }
+        if len(args) != 2 {
+            result["error"] = "must provide code and breakpointLineNumbers"
+            return js.ValueOf(result)
+        }
+
         code := args[0].String()
         breakpointLineNumbers := args[1]
         if err = validateJSArray(breakpointLineNumbers); err != nil {
-            return err.Error();
+            result["error"] = err.Error()
+            return js.ValueOf(result)
         }
 
         stdout = &bytes.Buffer{}
@@ -63,7 +86,8 @@ func main() {
 
 		program, err = interpreter.Compile(code)
 		if err != nil {
-			return err.Error()
+            result["error"] = err.Error()
+            return js.ValueOf(result)
 		}
 
         ctx := context.Background()
@@ -78,32 +102,51 @@ func main() {
         setBreakpoints(breakpointLineNumbers)
 
 		if err = debugger.Continue(0); err != nil {
-            fmt.Println("error when starting debug")
-			return err.Error()
+            result["error"] = err.Error()
+            return js.ValueOf(result)
 		}
 
-        fmt.Println("started debugging")
-		return stdout.String()
+        fmt.Println("started debugging");
+        result["output"] = stdout.String()
+        return js.ValueOf(result)
     }))
 
     js.Global().Set("setYaegiBreakpoints", js.FuncOf(func(this js.Value, args []js.Value) any {
+        result := map[string]any{
+            "error":   "",
+            "output":  "",
+        }
+        if !isDebugging() {
+            result["error"] = "must start debugging first"
+            return js.ValueOf(result)
+        }
         breakpointLineNumbers := args[0]
         if err = validateJSArray(breakpointLineNumbers); err != nil {
-            errStr := err.Error()
-            fmt.Println(errStr)
-            return errStr;
+            result["error"] = err.Error()
+            return js.ValueOf(result)
         }
         setBreakpoints(breakpointLineNumbers)
-        return nil
+
+        fmt.Println("set breakpoints");
+        return js.ValueOf(result)
     }))
 
     js.Global().Set("continueYaegiDebug", js.FuncOf(func(this js.Value, p []js.Value) any {
-        if err = debugger.Continue(0); err != nil {
-            fmt.Println("error when continuing debug")
-            return err.Error()
+        result := map[string]any{
+            "error":   "",
+            "output":  "",
         }
+        if !isDebugging() {
+            result["error"] = "must start debugging first"
+            return js.ValueOf(result)
+        }
+        if err = debugger.Continue(0); err != nil {
+            result["error"] = err.Error()
+            return js.ValueOf(result)
+        }
+
         fmt.Println("continued debugging")
-        return stdout.String()
+        return js.ValueOf(result)
     }))
 
     // Keep WASM running
@@ -118,10 +161,9 @@ func validateJSArray(obj js.Value) error {
 }
 
 func setBreakpoints(breakpointLineNumbers js.Value) {
-    if (debugger == nil || breakpointTarget == nil) {
+    if !isDebugging() {
         return
     }
-
     breakpointIndexToLineNumber := make(map[int]int)
     var breakpointRequests []interp.BreakpointRequest
 
@@ -149,5 +191,9 @@ func setBreakpoints(breakpointLineNumbers js.Value) {
         invalidBreakpointLineNumbersJS.Call("add", lineNumber)
     }
     js.Global().Call("invalidateBreakpoints", invalidBreakpointLineNumbersJS)
+}
+
+func isDebugging() bool {
+    return debugger != nil && breakpointTarget != nil;
 }
 
