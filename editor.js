@@ -13,10 +13,41 @@ func main() {
 }`;
 
 require(["vs/editor/editor.main"], function() {
-    window.editor = monaco.editor.create(document.getElementById("editor"), {
+    const editor = monaco.editor.create(document.getElementById("editor"), {
         value: code,
         language: "go",
         theme: "vs-dark",
-        automaticLayout: true
+        automaticLayout: true,
+	glyphMargin: true
     });
+
+    const breakpoints = new Set();
+    let decorations = [];
+
+    editor.onMouseDown(e => {
+	if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_LINE_NUMBERS && 
+	e.target.type !== monaco.editor.MouseTargetType.GUTTER_GLYPH_MARGIN) {
+		return;
+	}
+            const line = e.target.position.lineNumber;
+
+            if (breakpoints.has(line)) {
+                breakpoints.delete(line);
+            } else {
+                breakpoints.add(line);
+            }
+
+            decorations = editor.deltaDecorations(decorations,
+                [...breakpoints].map(line => ({
+                    range: new monaco.Range(line, 1, line, 1),
+                    options: {
+                        isWholeLine: true,
+                        glyphMarginClassName: "debugBreakpoint"
+                    }
+                }))
+            );
+    });
+
+    window.editor = editor;
+    window.getBreakpoints = () => [...breakpoints];
 });

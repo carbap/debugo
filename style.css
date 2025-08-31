@@ -81,6 +81,15 @@ body {
     overflow: hidden;
 }
 
+.monaco-editor .glyph-margin-widgets .debugBreakpoint {
+  background: url("data:image/svg+xml;utf8,<svg width='16' height='16' xmlns='http://www.w3.org/2000/svg'><circle cx='8' cy='8' r='5' fill='red'/></svg>") center no-repeat;
+}
+
+/* Highlight the entire glyph margin on hover */
+.monaco-editor .margin-view-overlays > div:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
 #outputDiv {
     height: 38.2%;
     min-height: 10%;
