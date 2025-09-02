@@ -19,6 +19,7 @@ function reset() {
     runBtn.disabled = false;
     debugBtn.disabled = false;
     continueBtn.disabled = true;
+    setReadonly(false)
 }
 window.reset = reset;
 
@@ -30,6 +31,7 @@ function setDebug() {
     runBtn.disabled = true;
     debugBtn.disabled = true;
     continueBtn.disabled = false;
+    setReadonly(true)
     resetOutput();
 }
 
@@ -74,6 +76,12 @@ const output = document.getElementById('output');
 
 let isResizing = false;
 let lastEditorRatio = 0.618;
+
+function setReadonly(flag) {
+    if (window.editor?.updateOptions != null) {
+        window.editor.updateOptions({ readOnly: flag });
+    }
+}
 
 resizer.addEventListener('mousedown', (e) => {
     isResizing = true;
@@ -154,7 +162,7 @@ const DebugEventReasonName = Object.fromEntries(
     Object.entries(DebugEventReason).map(([k, v]) => [v, k])
 );
 
-window.onDebugEvent = function (reason, stdout) {
+window.onDebugEvent = function (reason, stdout, infoFrames) {
     console.log(DebugEventReasonName[reason]);
     if (reason == DebugEventReason.DebugTerminate) {
         reset();

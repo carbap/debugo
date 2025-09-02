@@ -18,6 +18,7 @@ var breakpointTarget interp.BreakpointTarget
 var stdout *bytes.Buffer
 var stderr *bytes.Buffer
 const DEBUG_TERMINATE = 7
+const DEBUG_BREAK = 2
 
 func main() {
     js.Global().Set("runYaegi", js.FuncOf(func(this js.Value, args []js.Value) any {
@@ -99,7 +100,20 @@ func main() {
             }
             reasonJS := js.ValueOf(int(reason))
             outputJS := js.ValueOf(stdout.String())
-            js.Global().Call("onDebugEvent", reasonJS, outputJS)
+            framesJS := js.ValueOf(-1)
+            if reason == DEBUG_BREAK {
+                frameDepth := int(e.FrameDepth())
+                debugFrames := e.Frames(0, frameDepth - 1)                
+                framesJS = js.Global().Get("Array").New(len(debugFrames))
+                for i, df := range debugFrames {
+                    frameJS := js.ValueOf(map[string]interface{}{
+                        "name": df.Name(),
+                        "position": df.Position().String(),
+                    })
+                    framesJS.SetIndex(i, frameJS)
+                }
+            }
+            js.Global().Call("onDebugEvent", reasonJS, outputJS, framesJS)
         }
         var opts *interp.DebugOptions = nil
 		debugger = interpreter.Debug(ctx, program, events, opts)
