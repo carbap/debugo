@@ -131,8 +131,7 @@ window.addEventListener('resize', () => {
 debugBtn.addEventListener("click", () => {
     setDebug();
     const code = window.editor.getValue();
-    const breakpoints = [...window.breakpoints];
-    const result = startYaegiDebug(code, breakpoints);
+    const result = startYaegiDebug(code, window.getBreakpointLineNumbers());
     if (!checkResult(result)) {
         output.textContent += result.error;
     }

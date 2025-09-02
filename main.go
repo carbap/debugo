@@ -103,7 +103,7 @@ func main() {
             framesJS := js.ValueOf(-1)
             if reason == DEBUG_BREAK {
                 frameDepth := int(e.FrameDepth())
-                debugFrames := e.Frames(0, frameDepth - 1)                
+                debugFrames := e.Frames(0, frameDepth - 1)
                 framesJS = js.Global().Get("Array").New(len(debugFrames))
                 for i, df := range debugFrames {
                     frameJS := js.ValueOf(map[string]interface{}{
@@ -179,38 +179,51 @@ func validateJSArray(obj js.Value) error {
     return nil
 }
 
+type MyBreakpointInfo struct {
+    LineNumber int
+    Position   string
+    Valid bool
+}
+
 func setBreakpoints(breakpointLineNumbers js.Value) {
     numBreakpoints := breakpointLineNumbers.Length()
     if !isDebugging() || numBreakpoints <= 0 {
         return
     }
-    breakpointIndexToLineNumber := make(map[int]int)
-    var breakpointRequests []interp.BreakpointRequest
+
+    breakpointRequests := make([]interp.BreakpointRequest, numBreakpoints)
+    breakpointInfo := make([]MyBreakpointInfo, numBreakpoints)
 
     for i := 0; i < numBreakpoints; i++ {
         lineNumber := breakpointLineNumbers.Index(i).Int()
-        breakpointRequests = append(breakpointRequests, interp.LineBreakpoint(lineNumber))
-        breakpointIndexToLineNumber[i] = lineNumber
+        breakpointRequests[i] = interp.LineBreakpoint(lineNumber)
+        breakpointInfo[i] = MyBreakpointInfo{
+            LineNumber: lineNumber,
+            Position: "",
+            Valid: true,
+        }
         fmt.Println("breakpoint", i, "on line", lineNumber)
     }
 
     breakpoints := debugger.SetBreakpoints(breakpointTarget, breakpointRequests...)
 
-    var invalidBreakpointLineNumbers []int
+    breakpointsJS := js.Global().Get("Array").New(numBreakpoints)
     for i, bp := range breakpoints {
+        breakpointInfo[i].Position = bp.Position.String()
+        breakpointInfo[i].Valid = bp.Valid
         if bp.Valid {
             fmt.Println("valid breakpoint", i, "set at", bp.Position)
         } else {
             fmt.Println("invalid breakpoint", i)
-            invalidBreakpointLineNumbers = append(invalidBreakpointLineNumbers, breakpointIndexToLineNumber[i])
         }
+        bpJS := js.ValueOf(map[string]interface{}{
+            "lineNumber": breakpointInfo[i].LineNumber,
+            "position":   breakpointInfo[i].Position,
+            "valid":    breakpointInfo[i].Valid,
+        })
+        breakpointsJS.SetIndex(i, bpJS)
     }
-
-    invalidBreakpointLineNumbersJS := js.Global().Get("Set").New()
-    for _, lineNumber := range invalidBreakpointLineNumbers {
-        invalidBreakpointLineNumbersJS.Call("add", lineNumber)
-    }
-    js.Global().Call("invalidateBreakpoints", invalidBreakpointLineNumbersJS)
+    js.Global().Call("updateBreakpoints", breakpointsJS)
 }
 
 func isDebugging() bool {

@@ -12,8 +12,14 @@ func main() {
 	fmt.Println("Hello World!")
 }`;
 
-const breakpoints = new Set();
-let invalidBreakpoints = new Set();
+const breakpoints = {};
+window.getBreakpointValues = () => {
+    return Object.values(breakpoints)
+        .filter(bp => bp != null);
+}
+window.getBreakpointLineNumbers = () => {
+    return window.getBreakpointValues().map(bp => bp.lineNumber);
+}
 let decorations = [];
 const DEBUG_BREAKPOINT = "debugBreakpoint";
 const INVALID_DEBUG_BREAKPOINT = "invalidDebugBreakpoint";
@@ -29,7 +35,6 @@ require(["vs/editor/editor.main"], function () {
 
     window.editor = editor;
     window.breakpoints = breakpoints;
-    window.invalidBreakpoints = invalidBreakpoints;
 
     editor.onMouseDown(e => {
         if (e.target.type !== monaco.editor.MouseTargetType.GUTTER_LINE_NUMBERS &&
@@ -38,32 +43,49 @@ require(["vs/editor/editor.main"], function () {
         }
         const line = e.target.position.lineNumber;
 
-        if (breakpoints.has(line)) {
-            breakpoints.delete(line);
+        if (breakpoints[line] != null) {
+            breakpoints[line] = null;
         } else {
-            breakpoints.add(line);
+            breakpoints[line] = {
+                lineNumber: line,
+                valid: true
+            };
         }
 
         setDecorations();
-        setYaegiBreakpoints([...breakpoints]);
+        setYaegiBreakpoints(getBreakpointLineNumbers());
     });
 });
 
-window.invalidateBreakpoints = function (event) {
-    invalidBreakpoints = event;
+window.updateBreakpoints = function (event) {
+    if (breakpoints == null || Object.keys(breakpoints).length <= 0) {
+        return;
+    }
+    if (event == null || event.length <= 0) {
+        return;
+    }
+    event.forEach(bpInfo => {
+        if (breakpoints[bpInfo.lineNumber] != null) {
+            breakpoints[bpInfo.lineNumber] = {
+                lineNumber: bpInfo.lineNumber,
+                position: bpInfo.position,
+                valid: bpInfo.valid
+            }
+        }
+    });
     setDecorations();
 };
 
 const setDecorations = () => {
     decorations = window.editor.deltaDecorations(
         decorations,
-        [...breakpoints].map(line => {
-            const glyphMarginClassName = invalidBreakpoints.has(line) ?
+        window.getBreakpointValues().map(bp => {
+            const glyphMarginClassName = bp.valid !== true ?
                 INVALID_DEBUG_BREAKPOINT : DEBUG_BREAKPOINT
             return {
-                range: new monaco.Range(line, 1, line, 1),
+                range: new monaco.Range(bp.lineNumber, 1, bp.lineNumber, 1),
                 options: {
-                    isWholeLine: true,
+                    isWholebp: true,
                     glyphMarginClassName: glyphMarginClassName
                 }
             };
