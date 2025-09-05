@@ -8,11 +8,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto+Mono:wght@500&family=Fira+Code&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
         <script src="https://unpkg.com/monaco-editor@0.52.2/min/vs/loader.js"></script>
-        <div id='topContainer'>
+        <div id="topContainer">
             <h1>Go in Browser (Yaegi)</h1>
-            <button id="runBtn" class="executionBtn">Run</button>
-            <button id="debugBtn" class="executionBtn">Debug</button>
-            <button id="continueBtn" class="executionBtn">Continue</button>
+            <div class="buttonGroup">
+                <button id="runBtn" class="executionBtn">Run</button>
+                <button id="debugBtn" class="executionBtn">Debug</button>
+                <button id="continueBtn" class="executionBtn">Continue</button>
+            </div>
         </div>
         <div id="splitContainer">
             <div id="editor"></div>
