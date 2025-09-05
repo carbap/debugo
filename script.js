@@ -163,16 +163,20 @@ const DebugEventReasonName = Object.fromEntries(
 
 window.onDebugEvent = function (reason, stdout, infoFrames) {
     console.log(DebugEventReasonName[reason]);
+    const position = infoFrames?.[0]?.position;
     if (reason == DebugEventReason.DebugTerminate) {
         reset();
+        window.highlightedLineNumber = null;
+        window.setDecorations();
         return;
-    }
-    const position = infoFrames?.[0]?.position;
-    if (reason == DebugEventReason.DebugBreak && position != null) {
+    } else if (reason == DebugEventReason.DebugBreak && position != null) {
         const bp = window.getBreakpointValues().find(bp => bp.position == position);
         if (bp != null) {
+            window.highlightedLineNumber = bp.lineNumber;
             console.log(`Highlight line ${bp.lineNumber} (${bp.position})`);
         }
+        window.setDecorations();
+
     }
     output.textContent = stdout;
 };
