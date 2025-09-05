@@ -14,8 +14,7 @@ func main() {
 
 const breakpoints = {};
 window.getBreakpointValues = () => {
-    return Object.values(breakpoints)
-        .filter(bp => bp != null);
+    return Object.values(breakpoints).filter(bp => bp != null);
 }
 window.getBreakpointLineNumbers = () => {
     return window.getBreakpointValues().map(bp => bp.lineNumber);
@@ -85,7 +84,6 @@ const setDecorations = () => {
             return {
                 range: new monaco.Range(bp.lineNumber, 1, bp.lineNumber, 1),
                 options: {
-                    isWholebp: true,
                     glyphMarginClassName: glyphMarginClassName
                 }
             };

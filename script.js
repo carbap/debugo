@@ -167,5 +167,12 @@ window.onDebugEvent = function (reason, stdout, infoFrames) {
         reset();
         return;
     }
+    const position = infoFrames?.[0]?.position;
+    if (reason == DebugEventReason.DebugBreak && position != null) {
+        const bp = window.getBreakpointValues().find(bp => bp.position == position);
+        if (bp != null) {
+            console.log(`Highlight line ${bp.lineNumber} (${bp.position})`);
+        }
+    }
     output.textContent = stdout;
 };
