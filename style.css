@@ -1,59 +1,84 @@
+:root {
+    /* Backgrounds */
+    --color-bg-dark: rgb(30, 30, 47);
+    --color-bg-alt: rgb(40, 40, 60);
+    --color-bg-hover: rgb(92, 92, 124);
+
+    /* Text */
+    --color-text-light: rgb(224, 224, 224);
+    --color-text-bright: rgb(240, 240, 240);
+    --color-text-dark: rgb(20, 20, 20);
+
+    /* Accents */
+    --color-accent-yellow: rgb(255, 204, 102);
+    --color-accent-yellow-hover: rgb(255, 219, 147);
+
+    --color-accent-green-primary: rgb(0, 200, 120); /* Run */
+    --color-accent-green-secondary: rgb(0, 150, 100); /* Debug / Continue */
+
+    /* Neutrals */
+    --color-gray: rgb(85, 85, 85);
+    --color-gray-light: rgb(102, 102, 102);
+    --color-white: rgb(255, 255, 255);
+}
+
+/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Remove default scrollbars */
 html,
 body {
     margin: 0;
     padding: 0;
     height: 100%;
     overflow: hidden;
-    /* prevents browser scroll */
 }
 
-/* Use full viewport for the layout */
+/* Layout */
 body {
     display: flex;
     flex-direction: column;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e1e2f;
-    color: #e0e0e0;
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-light);
 }
 
+/* --- Top Bar --- */
 #topContainer {
-    height: 15%;
-    min-height: 15%;
+    height: 12%;
+    min-height: 60px;
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 2rem;
+    background-color: var(--color-bg-alt);
+    border-bottom: 1px solid var(--color-gray);
 
-    /* --- Title --- */
+    /* Title */
     h1 {
         font-family: 'Poppins', sans-serif;
         font-weight: 600;
-        color: #ffcc66;
-        text-align: center;
+        color: var(--color-accent-yellow);
     }
 
-    /* --- Run Button --- */
+    /* Run Button (primary) */
     .executionBtn {
-        font-family: 'Roboto Mono', monospace;
-        font-weight: 500;
-        background-color: #4caf50;
-        color: #fff;
+        font-family: 'Fira Code', monospace;
+        font-weight: 700;
+        background-color: var(--color-accent-green-primary);
+        color: var(--color-white);
         border: none;
-        padding: 10px 20px;
-        display: block;
-        cursor: pointer;
+        padding: 10px 24px;
         border-radius: 6px;
-        transition: background 0.2s;
+        cursor: pointer;
+        transition: background-color 0.2s;
     }
     .executionBtn:hover {
-        background-color: #66bb6a;
+        background-color: var(--color-accent-green-secondary);
     }
     .executionBtn:disabled {
         opacity: 0.5;
@@ -68,22 +93,21 @@ body {
     }
 }
 
-/* Split container */
+/* --- Main Split --- */
 #splitContainer {
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 85%;
 }
 
-/* --- Monaco Editor Container --- */
+/* --- Editor --- */
 #editor {
     height: 61.8%;
-    min-height: 10%;
     width: 100%;
     overflow: hidden;
 }
 
+/* Breakpoints */
 .monaco-editor .glyph-margin-widgets .debugBreakpoint {
   background: url("data:image/svg+xml;utf8,<svg width='16' height='16' xmlns='http://www.w3.org/2000/svg'><circle cx='8' cy='8' r='5' fill='red'/></svg>") center no-repeat;
 }
@@ -97,44 +121,73 @@ body {
 }
 
 .monaco-editor .debugHighlightLine {
-    background-color: rgba(200, 50, 50, 0.3); /* semi-transparent red highlight */
+    background-color: rgba(200, 50, 50, 0.3);
 }
 
+/* --- Output Section --- */
 #outputDiv {
     height: 38.2%;
-    min-height: 10%;
+    display: flex;
 }
 
-/* --- Output --- */
 #output {
-    height: 100%;
+    background-color: var(--color-bg-alt);
+    color: var(--color-text-bright);
     margin: 0;
-    padding: 10px;
-    background: #2e2e3e;
+    padding: 12px;
     font-family: 'Fira Code', monospace;
-    color: #f0f0f0;
+    height: 100%;
+    width: 100%;
     overflow-y: auto;
     white-space: pre-wrap;
 }
 
-/* Optional: smooth scrollbar for output */
+/* Scrollbar */
 #output::-webkit-scrollbar {
     width: 8px;
 }
-
 #output::-webkit-scrollbar-thumb {
-    background-color: #666;
+    background-color: var(--color-gray-light);
 }
 
-/* Resizer */
+/* --- Debug Options --- */
+#debugOptions {
+    background-color: var(--color-bg-alt);
+    height: 100%;
+    width: 120px;
+    border-left: 1px solid var(--color-gray);
+}
+
+.debugOption {
+    background-color: var(--color-bg-alt);
+    color: var(--color-text-bright);
+    width: 100%;
+    padding: 12px;
+    font-family: 'Fira Code', monospace;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+.debugOption:hover {
+    background-color: var(--color-bg-hover);
+}
+.debugOption.debugOptionSelected {
+    background-color: var(--color-accent-yellow);
+    color: var(--color-text-dark);
+}
+.debugOption.debugOptionSelected:hover {
+    background-color: var(--color-accent-yellow-hover);
+}
+
+/* --- Resizer --- */
 #resizer {
     height: 8px;
-    background: #555;
+    background-color: var(--color-gray);
     cursor: row-resize;
-    transition: background 0.3s;
+    transition: background-color 0.2s;
 }
-
 #resizer:hover {
-    background: #ffcc66;
-    /* highlight on hover */
+    background-color: var(--color-accent-yellow);
 }
