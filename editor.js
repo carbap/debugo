@@ -30,7 +30,7 @@ const DEBUG_HIGHLIGHT_LINE = "debugHighlightLine";
 require(["vs/editor/editor.main"], function () {
     const mobileOpts = {
         scrollBeyondLastLine: false,
-        scrollBeyondLastColumn: 0,
+        scrollBeyondLastColumn: 10,
         minimap: { enabled: false },
         smoothScrolling: true,
         scrollbar: {
@@ -40,6 +40,8 @@ require(["vs/editor/editor.main"], function () {
             verticalScrollbarSize: 8,
         },
         fontSize: 14,
+        lineHeight: 24,
+        dragAndDrop: true,
         renderWhitespace: "none",
     }
     const editor = monaco.editor.create(document.getElementById("editor"), {
