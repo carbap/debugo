@@ -1,24 +1,24 @@
 :root {
     /* Backgrounds */
-    --color-bg-dark: rgb(30, 30, 47);
-    --color-bg-alt: rgb(40, 40, 60);
-    --color-bg-hover: rgb(92, 92, 124);
+    --color-bg-dark: rgb(30, 30, 50);
+    --color-bg-alt: rgb(50, 50, 70);
+    --color-bg-hover: rgb(70, 70, 90);
 
     /* Text */
-    --color-text-light: rgb(224, 224, 224);
+    --color-text-light: rgb(220, 220, 220);
     --color-text-bright: rgb(240, 240, 240);
     --color-text-dark: rgb(20, 20, 20);
 
     /* Accents */
-    --color-accent-yellow: rgb(255, 204, 102);
-    --color-accent-yellow-hover: rgb(255, 219, 147);
+    --color-accent-yellow: rgb(255, 200, 100);
+    --color-accent-yellow-hover: rgb(255, 220, 120);
 
-    --color-accent-green-primary: rgb(0, 200, 120); /* Run */
-    --color-accent-green-secondary: rgb(0, 150, 100); /* Debug / Continue */
+    --color-accent-green-primary: rgb(0, 200, 120);
+    --color-accent-green-secondary: rgb(0, 220, 140);
 
     /* Neutrals */
-    --color-gray: rgb(85, 85, 85);
-    --color-gray-light: rgb(102, 102, 102);
+    --color-gray: rgb(80, 80, 80);
+    --color-gray-light: rgb(100, 100, 100);
     --color-white: rgb(255, 255, 255);
 }
 
@@ -107,7 +107,7 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' preserveAspectRatio='none' fill='none' stroke='white'%3E%3Cpolygon stroke-linecap='round' stroke-linejoin='round' stroke-width='2' points='7,4 19,12 7,20'/%3E%3C/svg%3E");
 }
 #debugBtn::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='white' fill='none' preserveAspectRatio='none'%3E%3Cellipse cx='12' cy='14' rx='6' ry='7' stroke-width='2'/%3E%3Cline x1='4' y1='8' x2='8' y2='12' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='20' y1='8' x2='16' y2='12' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='12' y1='3' x2='12' y2='7' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='white' fill='none' preserveAspectRatio='none'%3E%3Cellipse cx='12' cy='14' rx='6' ry='7' stroke-width='2'/%3E%3Cline x1='4' y1='8' x2='8' y2='12' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='20' y1='8' x2='16' y2='12' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='12' y1='3' x2='12' y2='7' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='16' y1='16' x2='20' y2='20' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='8' y1='16' x2='4' y2='20' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 #continueBtn::before {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' preserveAspectRatio='none' fill='none' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M14 5l7 7m0 0l-7 7m7-7H3'/%3E%3C/svg%3E");
