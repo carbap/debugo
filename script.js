@@ -74,25 +74,30 @@ const resizer = document.getElementById('resizer');
 const outputDiv = document.getElementById('outputDiv');
 const output = document.getElementById('output');
 
-let isResizing = false;
-let lastEditorRatio = 0.618;
-
 function setReadonly(flag) {
     if (window.editor?.updateOptions != null) {
         window.editor.updateOptions({ readOnly: flag });
     }
 }
 
-resizer.addEventListener('mousedown', (e) => {
+let isResizing = false;
+let lastEditorRatio = 0.618;
+
+function startResize(e) {
     isResizing = true;
     document.body.style.cursor = 'row-resize';
-});
+    resizer.classList.add("active");
+}
 
-document.addEventListener('mousemove', (e) => {
-    if (!isResizing) return;
+function stopResize() {
+    isResizing = false;
+    document.body.style.cursor = 'default';
+    resizer.classList.remove("active");
+}
 
+function doResize(clientY) {
     const containerHeight = splitContainer.clientHeight > 0 ? splitContainer.clientHeight : 1;
-    let newEditorHeight = e.clientY - editor.offsetTop;
+    let newEditorHeight = clientY - editor.offsetTop;
     let newOutputHeight = containerHeight - newEditorHeight - resizer.offsetHeight;
 
     const minHeight = 0.1 * containerHeight;
@@ -109,14 +114,21 @@ document.addEventListener('mousemove', (e) => {
     outputDiv.style.height = `${newOutputHeight}px`;
 
     lastEditorRatio = newEditorHeight / containerHeight;
-});
+}
 
-document.addEventListener('mouseup', () => {
-    if (isResizing) {
-        isResizing = false;
-        document.body.style.cursor = 'default';
-    }
+resizer.addEventListener('mousedown', startResize);
+document.addEventListener('mousemove', (e) => {
+    if (isResizing) doResize(e.clientY);
 });
+document.addEventListener('mouseup', stopResize);
+
+resizer.addEventListener('touchstart', (e) => {
+    startResize(e.touches[0]);
+});
+document.addEventListener('touchmove', (e) => {
+    if (isResizing) doResize(e.touches[0].clientY);
+});
+document.addEventListener('touchend', stopResize);
 
 window.addEventListener('resize', () => {
     const containerHeight = splitContainer.clientHeight;
@@ -126,7 +138,6 @@ window.addEventListener('resize', () => {
     editor.style.height = `${newEditorHeight}px`;
     outputDiv.style.height = `${newOutputHeight}px`;
 });
-
 
 debugBtn.addEventListener("click", () => {
     setDebug();
