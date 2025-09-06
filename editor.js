@@ -5,6 +5,8 @@ require.config({
     }
 });
 
+const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 const code =
     `package main
 import "fmt"
@@ -26,12 +28,27 @@ const INVALID_DEBUG_BREAKPOINT = "invalidDebugBreakpoint";
 const DEBUG_HIGHLIGHT_LINE = "debugHighlightLine";
 
 require(["vs/editor/editor.main"], function () {
+    const mobileOpts = {
+        scrollBeyondLastLine: false,
+        scrollBeyondLastColumn: 0,
+        minimap: { enabled: false },
+        smoothScrolling: true,
+        scrollbar: {
+            vertical: "auto",
+            horizontal: "hidden",
+            useShadows: false,
+            verticalScrollbarSize: 8,
+        },
+        fontSize: 14,
+        renderWhitespace: "none",
+    }
     const editor = monaco.editor.create(document.getElementById("editor"), {
         value: code,
         language: "go",
         theme: "vs-dark",
         automaticLayout: true,
-        glyphMargin: true
+        glyphMargin: true,
+        ...(isMobile ? mobileOpts : {})
     });
 
     window.editor = editor;
