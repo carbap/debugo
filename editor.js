@@ -11,7 +11,7 @@ const code =
     `package main
 import "fmt"
 func main() {
-	fmt.Println("Hello World!")
+	fmt.Println("Hello, World!")
 }`;
 
 const breakpoints = {};
@@ -29,12 +29,12 @@ const DEBUG_HIGHLIGHT_LINE = "debugHighlightLine";
 
 require(["vs/editor/editor.main"], function () {
     const mobileOpts = {
-        scrollBeyondLastLine: false,
+        scrollBeyondLastLine: 10,
         scrollBeyondLastColumn: 10,
         minimap: { enabled: false },
         smoothScrolling: true,
         scrollbar: {
-            vertical: "auto",
+            vertical: "hidden",
             horizontal: "hidden",
             useShadows: false,
             verticalScrollbarSize: 8,

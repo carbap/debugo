@@ -3,18 +3,23 @@
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Go in Browser</title>
+    <title>Just Go</title>
     </head>
     <body>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto+Mono:wght@500&family=Fira+Code&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
         <script src="https://unpkg.com/monaco-editor@0.52.2/min/vs/loader.js"></script>
         <div id="topContainer">
-            <h1>Go in Browser (Yaegi)</h1>
+            <div class="titleGroup">
+                <button id="aboutBtn" class="executionBtn"></button>
+                <h1>Just Go</h1>
+            </div>
             <div class="buttonGroup">
                 <button id="runBtn" class="executionBtn">Run</button>
-                <button id="debugBtn" class="executionBtn">Debug</button>
-                <button id="continueBtn" class="executionBtn">Continue</button>
+                <div class="debugGroup">
+                    <button id="debugBtn" class="executionBtn yellowBtn">Debug</button>
+                    <button id="continueBtn" class="executionBtn yellowBtn">Continue</button>
+                </div>
             </div>
         </div>
         <div id="splitContainer">
