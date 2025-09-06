@@ -214,11 +214,24 @@ body {
 
 /* --- Resizer --- */
 #resizer {
+    position: relative;
     height: 8px;
     background-color: var(--color-gray);
     cursor: row-resize;
     transition: background-color 0.2s;
+    user-select: none;
+    touch-action: none;
 }
 #resizer:hover, #resizer.active {
     background-color: var(--color-accent-yellow);
+}
+#resizer::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 0;
+    right: 0;
+    bottom: -18px;
+    pointer-events: auto;
+    background: transparent;
 }
