@@ -50,6 +50,9 @@ require(["vs/editor/editor.main"], function () {
         theme: "vs-dark",
         automaticLayout: true,
         glyphMargin: true,
+        scrollbar: {
+            horizontal: "hidden",
+        },
         ...(isMobile ? mobileOpts : {})
     });
 

@@ -16,6 +16,9 @@ const debugBtn = document.getElementById("debugBtn");
 const continueBtn = document.getElementById("continueBtn");
 const debugOutput = document.getElementById("debugOutput");
 const debugScope = document.getElementById("debugScope");
+const statusBar = document.getElementById("statusBar");
+let statusBarTimeout = null;
+let runNumber = 0;
 
 function reset() {
     runBtn.disabled = false;
@@ -78,8 +81,10 @@ runBtn.addEventListener("click", async () => {
         const result = runYaegi(code);
         if (!checkResult(result)) {
             content = result.error;
+            showErrorStatus();
         } else {
             content = result.output;
+            showSuccessStatus();
         }
     } catch (ex) {
         content = ex
@@ -164,6 +169,7 @@ debugBtn.addEventListener("click", () => {
     const result = startYaegiDebug(code, window.getBreakpointLineNumbers());
     if (!checkResult(result)) {
         output.textContent += result.error;
+        showErrorStatus();
     }
 });
 
@@ -198,6 +204,7 @@ window.onDebugEvent = function (reason, stdout, infoFrames) {
         reset();
         window.highlightedLineNumber = null;
         window.setDecorations();
+        showSuccessStatus();
         return;
     } else if (reason == DebugEventReason.DebugBreak && position != null) {
         const bp = window.getBreakpointValues().find(bp => bp.position == position);
@@ -210,3 +217,25 @@ window.onDebugEvent = function (reason, stdout, infoFrames) {
     }
     output.textContent = stdout;
 };
+
+function showSuccessStatus() {
+    showStatus(true);
+}
+
+function showErrorStatus() {
+    showStatus(false);
+}
+
+function showStatus(isSuccess) {
+    runNumber += 1;
+    const msg = isSuccess ? "Success" : "Erroŕ";
+    statusBar.textContent = `Run #${runNumber}: ${msg}`;
+    statusBar.classList.remove(...[isSuccess ? "error" : "success"]);
+    statusBar.classList.add(...["active", isSuccess ? "success" : "error"]);
+    if (statusBarTimeout != null) {
+        clearTimeout(statusBarTimeout);
+    }
+    statusBarTimeout = setTimeout(() => {
+        statusBar.classList.remove("active");
+    }, 3000);
+}

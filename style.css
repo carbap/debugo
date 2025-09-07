@@ -5,6 +5,7 @@
     --color-bg-hover: rgb(70, 70, 90);
 
     /* Text */
+    --color-text-white: rgb(255, 255, 255);
     --color-text-bright: rgb(235, 235, 235);
     --color-text-dark: rgb(20, 20, 20);
 
@@ -15,10 +16,12 @@
     --color-accent-green: rgb(0, 200, 120);
     --color-accent-green-hover: rgb(0, 220, 140);
 
+    --color-accent-red: rgb(220, 0, 60);
+    --color-accent-red-hover: rgb(240, 0, 80);
+
     /* Neutrals */
     --color-gray: rgb(80, 80, 80);
     --color-gray-light: rgb(100, 100, 100);
-    --color-white: rgb(255, 255, 255);
 
     --code-font: 'Fira Code', monospace;
     --ui-font: 'Ubuntu', sans-serif;
@@ -112,7 +115,7 @@ body {
 }
 
 #runBtn {
-    color: var(--color-white);
+    color: var(--color-text-white);
     background-color: var(--color-accent-green);
     transition: background-color 0.2s;
 }
@@ -240,6 +243,7 @@ body {
     cursor: pointer;
     text-align: left;
     transition: background-color 0.2s;
+    z-index: 11;
 }
 .debugOption:hover {
     background-color: var(--color-bg-hover);
@@ -265,6 +269,7 @@ body {
     transition: background-color 0.2s;
     user-select: none;
     touch-action: none;
+    z-index: 10;
 }
 #resizer:hover, #resizer.active {
     background-color: var(--color-accent-yellow);
@@ -278,4 +283,27 @@ body {
     bottom: -18px;
     pointer-events: auto;
     background: transparent;
+}
+
+#statusBar {
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--code-font);
+    font-size: 12px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+#statusBar.active {
+    transform: translateY(0);
+}
+#statusBar.success {
+    background: var(--color-accent-green);
+    color: var(--color-text-white);
+}
+#statusBar.error {
+    background: var(--color-accent-red);
+    color: var(--color-text-white);
 }
