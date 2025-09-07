@@ -14,12 +14,16 @@ let mod, inst;
 const runBtn = document.getElementById("runBtn");
 const debugBtn = document.getElementById("debugBtn");
 const continueBtn = document.getElementById("continueBtn");
+const debugOutput = document.getElementById("debugOutput");
+const debugScope = document.getElementById("debugScope");
 
 function reset() {
     runBtn.disabled = false;
     debugBtn.disabled = false;
     continueBtn.disabled = true;
     setReadonly(false)
+    selectDebugOption(debugOutput, [debugScope]);
+    debugScope.style.display = 'none';
 }
 window.reset = reset;
 
@@ -33,7 +37,22 @@ function setDebug() {
     continueBtn.disabled = false;
     setReadonly(true)
     resetOutput();
+    debugScope.style.display = 'block';
 }
+function selectDebugOption(optionToSelect, optionsToDeselect) {
+    optionToSelect.classList.add("debugOptionSelected");
+    if (optionsToDeselect?.length > 0) {
+        optionsToDeselect.forEach(option => {
+            option.classList.remove("debugOptionSelected");
+        });
+    }
+}
+debugOutput.addEventListener("click", async () => {
+    selectDebugOption(debugOutput, [debugScope]);
+});
+debugScope.addEventListener("click", async () => {
+    selectDebugOption(debugScope, [debugOutput]);
+});
 
 async function initWasm() {
     const resp = await fetch("yaegi.wasm");

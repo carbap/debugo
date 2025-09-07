@@ -8,7 +8,7 @@ require.config({
 const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 const code =
-    `package main
+`package main
 import "fmt"
 func main() {
 	fmt.Println("Hello, World!")
