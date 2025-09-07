@@ -8,6 +8,8 @@
     --color-text-white: rgb(255, 255, 255);
     --color-text-bright: rgb(235, 235, 235);
     --color-text-dark: rgb(20, 20, 20);
+    --color-link: #0077cc;
+    --color-link-hover: #005fa3;
 
     /* Accents */
     --color-accent-yellow: rgb(255, 200, 100);
@@ -151,7 +153,28 @@ body {
     background-color: var(--color-bg-hover);
 }
 #aboutBtn::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' fill='none' stroke='rgb(235, 235, 235)' width='24' height='24'%3E%3Crect id='backgroundrect' width='100%25' height='100%25' x='0' y='0' fill='none' stroke='none'/%3E%3Cg class='currentLayer' transform='rotate(-90 12 12)'%3E%3Cline x1='8' y1='4' x2='16' y2='12' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3Cline x1='16' y1='12' x2='8' y2='20' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' fill='none' stroke='rgb(235, 235, 235)' width='24' height='24'%3E%3Crect id='backgroundrect' width='100%25' height='100%25' x='0' y='0' fill='none' stroke='none'/%3E%3Cg class='currentLayer'%3E%3Cline x1='8' y1='4' x2='16' y2='12' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3Cline x1='16' y1='12' x2='8' y2='20' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+    transform: rotate(var(--arrow-rotation, 0deg));
+    transition: transform 0.3s ease;
+}
+
+#aboutSection {
+    z-index: 12;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    position: absolute;
+    background-color: var(--color-bg-dark);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+}
+#aboutSection.active {
+    transform: translateX(0);
+}
+
+#sectionGroup {
+    height: 100%;
+    display: flex;
 }
 
 @media (max-width: 600px) {
@@ -286,7 +309,10 @@ body {
 }
 
 #statusBar {
-    height: 18px;
+    position: absolute;
+    bottom: 0;
+    height: 16px;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -306,4 +332,23 @@ body {
 #statusBar.error {
     background: var(--color-accent-red);
     color: var(--color-text-white);
+}
+
+#aboutSection a {
+  color: var(--color-link);
+  font-weight: 500;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+#aboutSection a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+#aboutSection a[target="_blank"]::after {
+  content: "↗";
+  font-size: 0.85em;
+  margin-left: 3px;
 }

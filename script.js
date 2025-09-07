@@ -16,9 +16,15 @@ const debugBtn = document.getElementById("debugBtn");
 const continueBtn = document.getElementById("continueBtn");
 const debugOutput = document.getElementById("debugOutput");
 const debugScope = document.getElementById("debugScope");
+
 const statusBar = document.getElementById("statusBar");
 let statusBarTimeout = null;
 let runNumber = 0;
+
+const aboutBtn = document.getElementById("aboutBtn");
+let arrowRotation = 0;
+const aboutSection = document.getElementById("aboutSection");
+let isAboutOpened = false;
 
 function reset() {
     runBtn.disabled = false;
@@ -239,3 +245,15 @@ function showStatus(isSuccess) {
         statusBar.classList.remove("active");
     }, 3000);
 }
+
+aboutBtn.addEventListener("click", () => {
+    isAboutOpened = !isAboutOpened;
+    arrowRotation += 180;
+    aboutBtn.style.setProperty('--arrow-rotation', `${arrowRotation}deg`)
+    if (isAboutOpened) {
+        aboutSection.classList.add("active");
+    } else {
+        aboutSection.classList.remove("active");
+    }
+});
+

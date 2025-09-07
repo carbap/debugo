@@ -22,15 +22,28 @@
                 </div>
             </div>
         </div>
-        <div id="splitContainer">
-            <div id="editor"></div>
-            <div id="resizer"></div>
-            <div id="outputDiv">
-                <div id="debugOptions">
-                    <button id="debugOutput" class="debugOption debugOptionSelected" aria-pressed="true">Output</button>
-                    <button id="debugScope" class="debugOption" aria-pressed="false">Scope</button>
+        <div id="sectionGroup">
+            <div id="aboutSection">
+                <h2>About this project</h2>
+                </br>
+                <p><i>Just Go</i> is an interactive online playground for the Go programming language, powered by <a href="https://github.com/traefik/yaegi" target="_blank" rel="noopener noreferrer">Yaegi</a>, an open-source Go interpreter and debugger.</p>
+                </br>
+                <p>The backend of this application is a Go program that was compiled to WebAssembly and exposes Yaegi APIs to the browser as JavaScript functions. This allows you to run, debug, set breakpoints, and continue code execution entirely on the client side, without ever communicating with a server!</p>
+                </br>
+                <p>You can find out more information in the <a href="https://github.com/carbap/go-in-browser" target="_blank" rel="noopener noreferrer">GitHub</a> repository.</p>
+                </br>
+                <p>Have fun testing out Go!</p>
+            </div>
+            <div id="splitContainer">
+                <div id="editor"></div>
+                <div id="resizer"></div>
+                <div id="outputDiv">
+                    <div id="debugOptions">
+                        <button id="debugOutput" class="debugOption debugOptionSelected" aria-pressed="true">Output</button>
+                        <button id="debugScope" class="debugOption" aria-pressed="false">Scope</button>
+                    </div>
+                    <pre id="output"></pre>
                 </div>
-                <pre id="output"></pre>
             </div>
         </div>
         <div id="statusBar"></div>
