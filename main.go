@@ -5,6 +5,8 @@ import (
     "bytes"
     "syscall/js"
     "context"
+    "reflect"
+    "strings"
 
     "github.com/traefik/yaegi/interp"
     "github.com/traefik/yaegi/stdlib"
@@ -106,9 +108,25 @@ func main() {
                 debugFrames := e.Frames(0, frameDepth - 1)
                 framesJS = js.Global().Get("Array").New(len(debugFrames))
                 for i, df := range debugFrames {
+                    debugFrameScopes := df.Scopes()
+                    variablesJS := js.ValueOf(-1)
+                    if len(debugFrameScopes) >= 1 {
+                        debugVariables := debugFrameScopes[0].Variables()
+                        variablesJS = js.Global().Get("Array").New(len(debugVariables))
+                        for j, dv := range debugVariables {
+                            value, typeName := formatValue(dv.Value)
+                            variableJS := js.ValueOf(map[string]interface{}{
+                                "name": dv.Name,
+                                "value": value,
+                                "type": typeName,
+                            })
+                            variablesJS.SetIndex(j, variableJS)
+                        }
+                    }
                     frameJS := js.ValueOf(map[string]interface{}{
                         "name": df.Name(),
                         "position": df.Position().String(),
+                        "variables": variablesJS,
                     })
                     framesJS.SetIndex(i, frameJS)
                 }
@@ -244,4 +262,72 @@ func reset() {
 func resetAndReturn(result map[string]any) any {
     reset()
     return result
+}
+
+func formatValue(v reflect.Value) (string, string) {
+    if !v.IsValid() {
+        return "nil", "invalid"
+    }
+
+    typeName := v.Type().String()
+    formatted := ""
+
+    switch v.Kind() {
+    case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+        formatted = fmt.Sprintf("%d", v.Int())
+
+    case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+        formatted = fmt.Sprintf("%d", v.Uint())
+
+    case reflect.Float32, reflect.Float64:
+        formatted = fmt.Sprintf("%g", v.Float())
+
+    case reflect.Bool:
+        if v.Bool() {
+            formatted = "true"
+        } else {
+            formatted = "false"
+        }
+
+    case reflect.String:
+        formatted = fmt.Sprintf("%q", v.String())
+
+    case reflect.Slice, reflect.Array:
+        elems := []string{}
+        for i := 0; i < v.Len(); i++ {
+            elemStr, _ := formatValue(v.Index(i))
+            elems = append(elems, elemStr)
+        }
+        formatted = "[" + strings.Join(elems, ", ") + "]"
+
+    case reflect.Map:
+        pairs := []string{}
+        for _, key := range v.MapKeys() {
+            keyStr, _ := formatValue(key)
+            valStr, _ := formatValue(v.MapIndex(key))
+            pairs = append(pairs, keyStr+": "+valStr)
+        }
+        formatted = "{" + strings.Join(pairs, ", ") + "}"
+
+    case reflect.Struct:
+        fields := []string{}
+        for i := 0; i < v.NumField(); i++ {
+            fieldStr, _ := formatValue(v.Field(i))
+            fields = append(fields,
+                v.Type().Field(i).Name+": "+fieldStr)
+        }
+        formatted = "{" + strings.Join(fields, ", ") + "}"
+
+    case reflect.Pointer, reflect.Interface:
+        if v.IsNil() {
+            formatted = "nil"
+        } else {
+            formatted, _ = formatValue(v.Elem())
+        }
+
+    default:
+        formatted = v.String()
+    }
+
+    return formatted, typeName
 }

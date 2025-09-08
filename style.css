@@ -181,6 +181,9 @@ body {
     #topContainer h1 {
         display: none;
     }
+    #scopeVariables {
+        font-size: 14px;
+    }
 }
 @media (max-width: 380px) {
     #topContainer .executionBtn {
@@ -189,6 +192,9 @@ body {
     }
     #output {
         font-size: 14px;
+    }
+    #scopeVariables {
+        font-size: 12px;
     }
 }
 
@@ -225,26 +231,40 @@ body {
 
 /* --- Output Section --- */
 #outputDiv {
+    display: flex;
+    flex-direction: column;
     height: 38.2%;
 }
-
+#debugOptions {
+    flex: 0 0 auto;
+}
+#output.active, #scopeVariables.active {
+    display: block;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
 #output {
+    display: none;
     background-color: var(--color-bg-alt);
     color: var(--color-text-bright);
     margin: 0;
     padding: 12px;
+    font-size: 16px;
     font-family: var(--code-font);
-    height: 100%;
     width: 100%;
-    overflow-y: auto;
-    white-space: pre-wrap;
+}
+#scopeVariables {
+    display: none;
+    background-color: var(--color-bg-alt);
 }
 
 /* Scrollbar */
-#output::-webkit-scrollbar {
+#output::-webkit-scrollbar, #scopeVariables::-webkit-scrollbar {
     width: 8px;
 }
-#output::-webkit-scrollbar-thumb {
+#output::-webkit-scrollbar-thumb, #scopeVariables::-webkit-scrollbar-thumb {
     background-color: var(--color-gray-light);
 }
 
@@ -351,4 +371,38 @@ body {
   content: "↗";
   font-size: 0.85em;
   margin-left: 3px;
+}
+
+#scopeVariables table {
+    table-layout: fixed;
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+    font-family: var(--code-font);
+}
+
+#scopeVariables th, #scopeVariables td {
+    border-left: 1px solid var(--color-bg-hover);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    padding: 8px;
+    text-align: left;
+    width: 30%;
+}
+
+#scopeVariables th {
+    background-color: var(--color-bg-dark);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#scopeVariables tr:nth-child(even) {
+    background-color: var(--color-bg-dark);
+}
+
+#scopeVariables td:hover {
+    background-color: var(--color-bg-hover);
 }

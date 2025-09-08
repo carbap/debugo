@@ -1,7 +1,7 @@
 
 
 const checkResult = (result) => {
-    if (result.error != "") {
+    if (result?.error != "") {
         console.log(result.error);
         return false;
     }
@@ -26,13 +26,16 @@ let arrowRotation = 0;
 const aboutSection = document.getElementById("aboutSection");
 let isAboutOpened = false;
 
+const scopeVariables = document.getElementById("scopeVariables");
+
 function reset() {
     runBtn.disabled = false;
     debugBtn.disabled = false;
     continueBtn.disabled = true;
     setReadonly(false)
-    selectDebugOption(debugOutput, [debugScope]);
+    selectOutput();
     debugScope.style.display = 'none';
+    renderScopeVariables([]);
 }
 window.reset = reset;
 
@@ -56,11 +59,27 @@ function selectDebugOption(optionToSelect, optionsToDeselect) {
         });
     }
 }
-debugOutput.addEventListener("click", async () => {
+function activateDebugOption(optionToSelect, optionsToDeselect) {
+    optionToSelect.classList.add("active");
+    if (optionsToDeselect?.length > 0) {
+        optionsToDeselect.forEach(option => {
+            option.classList.remove("active");
+        });
+    }
+}
+function selectOutput() {
     selectDebugOption(debugOutput, [debugScope]);
+    activateDebugOption(output, [scopeVariables]);
+}
+function selectScope() {
+    selectDebugOption(debugScope, [debugOutput]);
+    activateDebugOption(scopeVariables, [output]);
+}
+debugOutput.addEventListener("click", async () => {
+    selectOutput();
 });
 debugScope.addEventListener("click", async () => {
-    selectDebugOption(debugScope, [debugOutput]);
+    selectScope();
 });
 
 async function initWasm() {
@@ -219,7 +238,7 @@ window.onDebugEvent = function (reason, stdout, infoFrames) {
             console.log(`Highlight line ${bp.lineNumber} (${bp.position})`);
         }
         window.setDecorations();
-
+        renderScopeVariables(infoFrames[0].variables);
     }
     output.textContent = stdout;
 };
@@ -257,3 +276,27 @@ aboutBtn.addEventListener("click", () => {
     }
 });
 
+function renderScopeVariables(variables) {
+    scopeVariables.innerHTML = "";
+
+    const table = document.createElement("table");
+
+    const header = table.createTHead();
+    const headerRow = header.insertRow();
+    ["Name", "Type", "Value"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        headerRow.appendChild(th);
+    });
+
+    const tbody = table.createTBody();
+    variables.forEach(v => {
+        const row = tbody.insertRow();
+        [v.name, v.type, v.value].forEach(val => {
+            const td = row.insertCell();
+            td.textContent = val;
+        });
+    });
+
+    scopeVariables.appendChild(table);
+}
