@@ -21,10 +21,10 @@ const statusBar = document.getElementById("statusBar");
 let statusBarTimeout = null;
 let runNumber = 0;
 
-const aboutBtn = document.getElementById("aboutBtn");
+const infoBtn = document.getElementById("infoBtn");
 let arrowRotation = 0;
-const aboutSection = document.getElementById("aboutSection");
-let isAboutOpened = false;
+const infoSection = document.getElementById("infoSection");
+let isInfoSectionOpened = false;
 
 const scopeVariables = document.getElementById("scopeVariables");
 
@@ -117,7 +117,7 @@ runBtn.addEventListener("click", async () => {
     output.textContent = content;
 });
 
-const splitContainer = document.getElementById('splitContainer');
+const mainSection = document.getElementById('mainSection');
 const editor = document.getElementById('editor');
 const resizer = document.getElementById('resizer');
 const outputDiv = document.getElementById('outputDiv');
@@ -145,7 +145,7 @@ function stopResize() {
 }
 
 function doResize(clientY) {
-    const containerHeight = splitContainer.clientHeight > 0 ? splitContainer.clientHeight : 1;
+    const containerHeight = mainSection.clientHeight > 0 ? mainSection.clientHeight : 1;
     let newEditorHeight = clientY - editor.offsetTop;
     let newOutputHeight = containerHeight - newEditorHeight - resizer.offsetHeight;
 
@@ -180,7 +180,7 @@ document.addEventListener('touchmove', (e) => {
 document.addEventListener('touchend', stopResize);
 
 window.addEventListener('resize', () => {
-    const containerHeight = splitContainer.clientHeight;
+    const containerHeight = mainSection.clientHeight;
     const newEditorHeight = containerHeight * lastEditorRatio;
     const newOutputHeight = containerHeight - newEditorHeight - resizer.offsetHeight;
 
@@ -253,8 +253,11 @@ function showErrorStatus() {
 
 function showStatus(isSuccess) {
     runNumber += 1;
-    const msg = isSuccess ? "Success" : "Error";
-    statusBar.textContent = `Run #${runNumber}: ${msg}`;
+    showMessage(isSuccess, `Run #${runNumber}: ${isSuccess ? "Success" : "Error"}`);
+}
+
+function showMessage(isSuccess, message) {
+    statusBar.textContent = message;
     statusBar.classList.remove(...[isSuccess ? "error" : "success"]);
     statusBar.classList.add(...["active", isSuccess ? "success" : "error"]);
     if (statusBarTimeout != null) {
@@ -264,17 +267,22 @@ function showStatus(isSuccess) {
         statusBar.classList.remove("active");
     }, 3000);
 }
+window.showMessage = showMessage;
 
-aboutBtn.addEventListener("click", () => {
-    isAboutOpened = !isAboutOpened;
-    arrowRotation += 180;
-    aboutBtn.style.setProperty('--arrow-rotation', `${arrowRotation}deg`)
-    if (isAboutOpened) {
-        aboutSection.classList.add("active");
-    } else {
-        aboutSection.classList.remove("active");
-    }
+infoBtn.addEventListener("click", () => {
+    toggleInfoSection();
 });
+function toggleInfoSection() {
+    isInfoSectionOpened = !isInfoSectionOpened;
+    arrowRotation += 180;
+    infoBtn.style.setProperty('--arrow-rotation', `${arrowRotation}deg`)
+    if (isInfoSectionOpened) {
+        infoSection.classList.add("active");
+    } else {
+        infoSection.classList.remove("active");
+    }
+}
+window.toggleInfoSection = toggleInfoSection;
 
 function renderScopeVariables(variables) {
     scopeVariables.innerHTML = "";

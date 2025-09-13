@@ -9,10 +9,51 @@ const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
 
 const code =
 `package main
+
 import "fmt"
+
 func main() {
 	fmt.Println("Hello, World!")
 }`;
+const codeExamples = document.getElementById("codeExamples");
+const examples = [
+    {
+        title: "Hello, World!",
+        code: code
+    },
+    {
+        fileName: "sieve_of_eratosthenes.go",
+        title: "Sieve of Eratosthenes",
+    },
+    {
+        fileName: "types.go",
+        title: "Explore Go types",
+    },
+];
+async function loadAllExamples() {
+    const promises = examples.slice(1).map(e => loadExample(e));
+    await Promise.all(promises);
+    examples.forEach(e => {
+        const button = document.createElement("button");
+        button.className = "executionBtn exampleBtn";
+        button.textContent = e.title;
+        button.addEventListener("click", async () => {
+            if (window.editor && e.code) {
+                window.editor.setValue(e.code);
+                window.showMessage(true, `Loaded example: ${e.title}`);
+                window.toggleInfoSection();
+            }
+        });
+        codeExamples.appendChild(button);
+    });
+}
+async function loadExample(example) {
+    const response = await fetch(`code_examples/${example.fileName}`);
+    if (response.ok) {
+        example.code = await response.text();
+    }
+}
+loadAllExamples();
 
 const breakpoints = {};
 window.getBreakpointValues = () => {

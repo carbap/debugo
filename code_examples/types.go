@@ -8,6 +8,7 @@ type Person struct {
 }
 
 func main() {
+	// Tip: place breakpoints and enter debug mode to inspect variables during runtime
 	var a int = -42
 	var b uint = 1000
 	var c float64 = 3.14
@@ -26,8 +27,8 @@ func main() {
 
 	s1 := Person{"Alice", 30}
 	s2 := struct {
-		Language string
-		Year     int
+		language string
+		year     int
 	}{"Go", 2009}
 
 	ptr := &a
