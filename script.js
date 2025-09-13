@@ -253,7 +253,7 @@ function showErrorStatus() {
 
 function showStatus(isSuccess) {
     runNumber += 1;
-    const msg = isSuccess ? "Success" : "Erroŕ";
+    const msg = isSuccess ? "Success" : "Error";
     statusBar.textContent = `Run #${runNumber}: ${msg}`;
     statusBar.classList.remove(...[isSuccess ? "error" : "success"]);
     statusBar.classList.add(...["active", isSuccess ? "success" : "error"]);
