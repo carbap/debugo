@@ -338,3 +338,96 @@ shareBtn.addEventListener("click", async () => {
         shareBtn.classList.remove("copied");
     }, 1000);
 });
+
+const coiso = `[
+{Xname: "a", Xvalue: -42},
+{Xname: "b", Xvalue: 1000},
+{Xname: "c", Xvalue: 3.14},
+{Xname: "d", Xvalue: true},
+{Xname: "e", Xvalue: "hello"},
+{Xname: "f", Xvalue: 955},
+{Xname: "g", Xvalue: 255},
+{Xname: "arr", Xvalue: [1, 2, 3]},
+{Xname: "sl1", Xvalue: ["foo", "bar"]},
+{Xname: "sl2", Xvalue: [0, 0, 0, 0, 0]},
+{Xname: "sl3", Xvalue: [0, 0, 0, 0, 0]},
+{Xname: "m1", Xvalue: {"x": 10, "y": 20}},
+{Xname: "m2", Xvalue: {}},
+{Xname: "s1", Xvalue: {Name: "Alice", Age: 30}},
+{Xname: "s2", Xvalue: {Xlanguage: "Go", Xyear: 2009}},
+{Xname: "ptr", Xvalue: 0x1806ca8: -42},
+{Xname: "ptrNil", Xvalue: nil},
+{Xname: "fn", Xvalue: 0x1e5f0000},
+{Xname: "ch1", Xvalue: 0x10564d0},
+{Xname: "ch2", Xvalue: 0x13acbd0},
+{Xname: "if1", Xvalue: {"b": 1000, "c": 3.14}},
+{Xname: "if2", Xvalue: {"e": "hello", "f": 955}},
+{Xname: "c64", Xvalue: (1+2i)},
+{Xname: "c128", Xvalue: (2+3i)}
+]`;
+const OPEN_CURLY   = '{';
+const CLOSE_CURLY  = '}';
+const OPEN_SQUARE  = '[';
+const CLOSE_SQUARE = ']';
+class Var {
+    constructor(startIndex, endIndex) {
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.value = null;
+        this.children = [];
+    }
+    setValue(str) {
+        this.value = str.slice(this.startIndex + 1, this.endIndex);
+    }
+}
+const root = new Var(0);
+const parents = [root];
+const openCurly = [];
+const openSquare = [];
+
+lastAction = null;
+const OPEN = 0;
+const CLOSE = 1;
+
+process(coiso);
+console.log(root);
+
+function process(str) {
+    for (let i = 0; i < str.length; i++) {
+        if (str[i] == OPEN_CURLY || str[i] == OPEN_SQUARE) {
+            const child = new Var(i, null);
+            const parent = parents.at(-1);
+            parent.children.push(child);
+            if (str[i] == OPEN_CURLY) {
+                openCurly.push(child);
+            } else if (str[i] == OPEN_SQUARE) {
+                openSquare.push(child);
+            }
+            parents.push(child);
+            lastAction = OPEN;
+        } else if (str[i] == CLOSE_CURLY || str[i] == CLOSE_SQUARE) {
+            parents.pop();
+            let node = null;
+            if (str[i] == CLOSE_CURLY) {
+                node = openCurly.pop();
+            } else if (str[i] == CLOSE_SQUARE) {
+                node = openSquare.pop();
+            }
+            node.endIndex = i;
+            node.setValue(str);
+            if (node.children.length > 0) {
+                const startIndex = node.children.at(-1).endIndex;
+                const child = new Var(startIndex, i);
+                child.setValue(str);
+                node.children.push(child);
+            }
+            lastAction = CLOSE;
+        } else if (str[i] == ',' && lastAction == OPEN && parents.length > 0) {
+            const parent = parents.at(-1);
+            const startIndex = parent.children.length > 0 ? parent.children.at(-1).startIndex : parent.startIndex;
+            const child = new Var(startIndex, i);
+            child.setValue(str);
+            parent.children.push(child);
+        }
+    }
+}
