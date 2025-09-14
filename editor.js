@@ -68,7 +68,13 @@ const DEBUG_BREAKPOINT = "debugBreakpoint";
 const INVALID_DEBUG_BREAKPOINT = "invalidDebugBreakpoint";
 const DEBUG_HIGHLIGHT_LINE = "debugHighlightLine";
 
+function getInitialCode() {
+    const encoded = window.location.hash.slice(1);
+    return encoded ? base64UrlDecode(encoded) : code;
+}
+
 require(["vs/editor/editor.main"], function () {
+    const initialCode = getInitialCode();
     const mobileOpts = {
         scrollBeyondLastLine: 10,
         scrollBeyondLastColumn: 10,
@@ -86,7 +92,7 @@ require(["vs/editor/editor.main"], function () {
         renderWhitespace: "none",
     }
     const editor = monaco.editor.create(document.getElementById("editor"), {
-        value: code,
+        value: initialCode,
         language: "go",
         theme: "vs-dark",
         automaticLayout: true,
@@ -169,3 +175,27 @@ const setDecorations = () => {
     );
 };
 window.setDecorations = setDecorations;
+
+function encode(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+
+function decode(str) {
+    return decodeURIComponent(escape(atob(str)));
+}
+
+function base64UrlEncode(str) {
+    return encode(str)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+}
+window.base64UrlEncode = base64UrlEncode;
+
+function base64UrlDecode(str) {
+    str = str
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    return decode(str);
+}
