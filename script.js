@@ -365,69 +365,58 @@ const coiso = `[
 {Xname: "c64", Xvalue: (1+2i)},
 {Xname: "c128", Xvalue: (2+3i)}
 ]`;
+const coiso2 = `{
+    Xname: "m1",
+    Xvalue: {"x": [0, 0, 0], "y": 20, "z": [[1,1], [2,2], [3,3]]},
+}`;
 const OPEN_CURLY   = '{';
 const CLOSE_CURLY  = '}';
 const OPEN_SQUARE  = '[';
 const CLOSE_SQUARE = ']';
-class Var {
-    constructor(startIndex, endIndex) {
-        this.startIndex = startIndex;
-        this.endIndex = endIndex;
-        this.value = null;
-        this.children = [];
+const COMMA = ',';
+
+const result = process(coiso2);
+printResult(result);
+
+function printResult(result) {
+    if (result == null || result.length <= 0) {
+        return;
     }
-    setValue(str) {
-        this.value = str.slice(this.startIndex + 1, this.endIndex);
-    }
+    result.forEach(r => {
+        console.log(r);
+        printResult(process(r))
+    });
 }
-const root = new Var(0);
-const parents = [root];
-const openCurly = [];
-const openSquare = [];
-
-lastAction = null;
-const OPEN = 0;
-const CLOSE = 1;
-
-process(coiso);
-console.log(root);
 
 function process(str) {
-    for (let i = 0; i < str.length; i++) {
-        if (str[i] == OPEN_CURLY || str[i] == OPEN_SQUARE) {
-            const child = new Var(i, null);
-            const parent = parents.at(-1);
-            parent.children.push(child);
-            if (str[i] == OPEN_CURLY) {
-                openCurly.push(child);
-            } else if (str[i] == OPEN_SQUARE) {
-                openSquare.push(child);
-            }
-            parents.push(child);
-            lastAction = OPEN;
-        } else if (str[i] == CLOSE_CURLY || str[i] == CLOSE_SQUARE) {
-            parents.pop();
-            let node = null;
-            if (str[i] == CLOSE_CURLY) {
-                node = openCurly.pop();
-            } else if (str[i] == CLOSE_SQUARE) {
-                node = openSquare.pop();
-            }
-            node.endIndex = i;
-            node.setValue(str);
-            if (node.children.length > 0) {
-                const startIndex = node.children.at(-1).endIndex;
-                const child = new Var(startIndex, i);
-                child.setValue(str);
-                node.children.push(child);
-            }
-            lastAction = CLOSE;
-        } else if (str[i] == ',' && lastAction == OPEN && parents.length > 0) {
-            const parent = parents.at(-1);
-            const startIndex = parent.children.length > 0 ? parent.children.at(-1).startIndex : parent.startIndex;
-            const child = new Var(startIndex, i);
-            child.setValue(str);
-            parent.children.push(child);
+    const variables = [];
+    const pushVariable = (variableStr) => {
+        const trimmed = variableStr.trim();
+        if (trimmed != "") {
+            variables.push(trimmed);
         }
     }
+    let currentStartIndex = 0;
+    let openChar = null;
+    let endChar = null;
+    let open = 0;
+    for (let i = 0; i < str.length; i++) {
+        if (str[i] == OPEN_CURLY || str[i] == OPEN_SQUARE) {
+            if (openChar == null) {
+                currentStartIndex = i;
+                openChar = str[i];
+                endChar = openChar == OPEN_CURLY ? CLOSE_CURLY : CLOSE_SQUARE;
+            }
+            open += 1;
+        } else if (str[i] == CLOSE_CURLY || str[i] == CLOSE_SQUARE) {
+            open -= 1;
+            if (open == 0) {
+                pushVariable(str.slice(currentStartIndex + 1, i));
+            }
+        } else if (str[i] == COMMA && open == 1) {
+            pushVariable(str.slice(currentStartIndex + 1, i));
+            currentStartIndex = i;
+        }
+    }
+    return variables;
 }
