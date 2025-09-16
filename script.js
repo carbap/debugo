@@ -318,13 +318,6 @@ function renderScopeVariables(variables) {
     scopeVariables.appendChild(table);
 }
 
-function inspectVariable(variableString) {
-    const scopeVars = processVariableString(variableString);
-    if (scopeVars.length > 0) {
-        console.log(scopeVars);
-    }
-}
-
 shareBtn.addEventListener("click", async () => {
     try {
         const encoded = window.base64UrlEncode(window.editor.getValue());
@@ -351,7 +344,6 @@ shareBtn.addEventListener("click", async () => {
 
 class ScopeVar {
     constructor(str, startIndex, endIndex) {
-        this.str = str;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.value = str.slice(this.startIndex + 1, this.endIndex).trim();
@@ -413,4 +405,25 @@ function processVariableString(str) {
         }
     }
     return scopeVars;
+}
+
+function inspectVariable(variableString) {
+    const scopeVars = processVariableString(variableString);
+    if (scopeVars.length <= 0) {
+        return;
+    }
+    const container = document.createElement("div");
+    container.id = "inspectVariables";
+
+    const frame = document.createElement("div");
+    frame.classList.add("variableFrame");
+
+    const frame2 = document.createElement("div");
+    frame2.classList.add("variableFrame");
+
+    container.appendChild(frame);
+    container.appendChild(frame2);
+
+    document.documentElement.appendChild(container);
+    document.body.style.opacity = "0.5";
 }

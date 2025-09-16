@@ -436,3 +436,25 @@ body {
     min-width: fit-content;
     max-width: fit-content;
 }
+
+#inspectVariables {
+    display: flex;
+    position: fixed;
+    top: 10%;
+    left: 0;
+    width: 100vw;
+    height: 80%;
+    z-index: 12;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+}
+
+.variableFrame {
+    background-color: red;
+    flex: 0 0 80%;
+    height: 100%;
+    margin-left: 10%;
+    margin-right: 10%;
+    scroll-snap-align: center;
+}
