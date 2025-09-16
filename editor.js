@@ -27,7 +27,7 @@ const examples = [
     },
     {
         fileName: "types.go",
-        title: "Explore Go types",
+        title: "Exploring Go's types",
     },
 ];
 async function loadAllExamples() {

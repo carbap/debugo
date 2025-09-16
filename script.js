@@ -309,10 +309,20 @@ function renderScopeVariables(variables) {
         [v.name, v.type, v.value].forEach(val => {
             const td = row.insertCell();
             td.textContent = val;
+            td.addEventListener("click", async () => {
+                inspectVariable(td.textContent);
+            });
         });
     });
 
     scopeVariables.appendChild(table);
+}
+
+function inspectVariable(variableString) {
+    const scopeVars = processVariableString(variableString);
+    if (scopeVars.length > 0) {
+        console.log(scopeVars);
+    }
 }
 
 shareBtn.addEventListener("click", async () => {
@@ -339,68 +349,52 @@ shareBtn.addEventListener("click", async () => {
     }, 1000);
 });
 
-const coiso = `[
-{Xname: "a", Xvalue: -42},
-{Xname: "b", Xvalue: 1000},
-{Xname: "c", Xvalue: 3.14},
-{Xname: "d", Xvalue: true},
-{Xname: "e", Xvalue: "hello"},
-{Xname: "f", Xvalue: 955},
-{Xname: "g", Xvalue: 255},
-{Xname: "arr", Xvalue: [1, 2, 3]},
-{Xname: "sl1", Xvalue: ["foo", "bar"]},
-{Xname: "sl2", Xvalue: [0, 0, 0, 0, 0]},
-{Xname: "sl3", Xvalue: [0, 0, 0, 0, 0]},
-{Xname: "m1", Xvalue: {"x": 10, "y": 20}},
-{Xname: "m2", Xvalue: {}},
-{Xname: "s1", Xvalue: {Name: "Alice", Age: 30}},
-{Xname: "s2", Xvalue: {Xlanguage: "Go", Xyear: 2009}},
-{Xname: "ptr", Xvalue: 0x1806ca8: -42},
-{Xname: "ptrNil", Xvalue: nil},
-{Xname: "fn", Xvalue: 0x1e5f0000},
-{Xname: "ch1", Xvalue: 0x10564d0},
-{Xname: "ch2", Xvalue: 0x13acbd0},
-{Xname: "if1", Xvalue: {"b": 1000, "c": 3.14}},
-{Xname: "if2", Xvalue: {"e": "hello", "f": 955}},
-{Xname: "c64", Xvalue: (1+2i)},
-{Xname: "c128", Xvalue: (2+3i)}
-]`;
-const coiso2 = `{
-    Xname: "m1",
-    Xvalue: {"x": [0, 0, 0], "y": 20, "z": [[1,1], [2,2], [3,3]]},
-}`;
+class ScopeVar {
+    constructor(str, startIndex, endIndex) {
+        this.str = str;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+        this.value = str.slice(this.startIndex + 1, this.endIndex).trim();
+    }
+}
+
 const OPEN_CURLY   = '{';
 const CLOSE_CURLY  = '}';
 const OPEN_SQUARE  = '[';
 const CLOSE_SQUARE = ']';
 const COMMA = ',';
+const QUOTE = '"';
 
-const result = process(coiso2);
-printResult(result);
-
-function printResult(result) {
-    if (result == null || result.length <= 0) {
+function printScopeVars(scopeVars) {
+    if (scopeVars == null || scopeVars.length <= 0) {
         return;
     }
-    result.forEach(r => {
-        console.log(r);
-        printResult(process(r))
+    scopeVars.forEach(sv => {
+        console.log(sv);
+        printScopeVars(processVariableString(sv.value))
     });
 }
 
-function process(str) {
-    const variables = [];
-    const pushVariable = (variableStr) => {
-        const trimmed = variableStr.trim();
-        if (trimmed != "") {
-            variables.push(trimmed);
+function processVariableString(str) {
+    const scopeVars = [];
+    const pushScopeVar = (variableStr, startIndex, endIndex) => {
+        const scopeVar = new ScopeVar(variableStr, startIndex, endIndex);
+        if (scopeVar.value != "") {
+            scopeVars.push(scopeVar);
         }
     }
     let currentStartIndex = 0;
     let openChar = null;
     let endChar = null;
     let open = 0;
+    let quotesAreOpen = false;
     for (let i = 0; i < str.length; i++) {
+        if (str[i] == QUOTE) {
+            quotesAreOpen = !quotesAreOpen;
+        }
+        if (quotesAreOpen) {
+            continue;
+        }
         if (str[i] == OPEN_CURLY || str[i] == OPEN_SQUARE) {
             if (openChar == null) {
                 currentStartIndex = i;
@@ -411,12 +405,12 @@ function process(str) {
         } else if (str[i] == CLOSE_CURLY || str[i] == CLOSE_SQUARE) {
             open -= 1;
             if (open == 0) {
-                pushVariable(str.slice(currentStartIndex + 1, i));
+                pushScopeVar(str, currentStartIndex, i);
             }
         } else if (str[i] == COMMA && open == 1) {
-            pushVariable(str.slice(currentStartIndex + 1, i));
+            pushScopeVar(str, currentStartIndex, i);
             currentStartIndex = i;
         }
     }
-    return variables;
+    return scopeVars;
 }
