@@ -310,7 +310,7 @@ function renderScopeVariables(variables) {
             const td = row.insertCell();
             td.textContent = val;
             td.addEventListener("click", async () => {
-                inspectVariable(td.textContent);
+                inspectVariable(v.name, td.textContent);
             });
         });
     });
@@ -407,13 +407,12 @@ function processVariableString(str) {
     return scopeVars;
 }
 
-function inspectVariable(variableString) {
+function inspectVariable(variableName, variableString) {
     const scopeVars = processVariableString(variableString);
     if (scopeVars.length <= 0) {
         return;
     }
-    const overlay = document.createElement("div");
-    overlay.id = "inspectVariablesOverlay";
+
 
     const container = document.createElement("div");
     container.id = "inspectVariables";
@@ -421,12 +420,30 @@ function inspectVariable(variableString) {
     const frame = document.createElement("div");
     frame.classList.add("variableFrame");
 
-    const frame2 = document.createElement("div");
-    frame2.classList.add("variableFrame");
+    const headerSpan = document.createElement("span");
+    headerSpan.textContent = variableName;
+
+    const header = document.createElement("div");
+    header.classList.add("variableFrame-header");
+    header.appendChild(headerSpan);
+
+    frame.appendChild(header);
+
+    scopeVars.forEach((v, i) => {
+        const rowSpan = document.createElement("span");
+        rowSpan.textContent = v.value;
+
+        const row = document.createElement("div");
+        row.classList.add("variableFrame-row");
+        row.appendChild(rowSpan);
+
+        frame.appendChild(row);
+    });
 
     container.appendChild(frame);
-    container.appendChild(frame2);
 
+    const overlay = document.createElement("div");
+    overlay.id = "inspectVariablesOverlay";
     overlay.appendChild(container);
     overlay.addEventListener("click", (e) => {
         if (!container.contains(e.target)) {
