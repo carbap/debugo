@@ -412,6 +412,9 @@ function inspectVariable(variableString) {
     if (scopeVars.length <= 0) {
         return;
     }
+    const overlay = document.createElement("div");
+    overlay.id = "inspectVariablesOverlay";
+
     const container = document.createElement("div");
     container.id = "inspectVariables";
 
@@ -424,6 +427,11 @@ function inspectVariable(variableString) {
     container.appendChild(frame);
     container.appendChild(frame2);
 
-    document.documentElement.appendChild(container);
-    document.body.style.opacity = "0.5";
+    overlay.appendChild(container);
+    overlay.addEventListener("click", (e) => {
+        if (!container.contains(e.target)) {
+            overlay.remove();
+        }
+    });
+    document.documentElement.appendChild(overlay);
 }

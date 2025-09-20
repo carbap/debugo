@@ -437,6 +437,16 @@ body {
     max-width: fit-content;
 }
 
+#inspectVariablesOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.5);
+}
+
 #inspectVariables {
     display: flex;
     position: fixed;
@@ -448,6 +458,9 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
+}
+#inspectVariables::-webkit-scrollbar {
+    display: none;
 }
 
 .variableFrame {
