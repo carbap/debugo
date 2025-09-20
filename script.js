@@ -295,6 +295,15 @@ function renderScopeVariables(variables) {
 
     const table = document.createElement("table");
 
+    const colgroup = document.createElement("colgroup");
+    const widths = ["10%", "10%", "80%"];
+    widths.forEach(w => {
+        const col = document.createElement("col");
+        col.style.width = w;
+        colgroup.appendChild(col);
+    });
+    table.appendChild(colgroup);
+
     const header = table.createTHead();
     const headerRow = header.insertRow();
     ["Name", "Type", "Value"].forEach(text => {
@@ -306,12 +315,29 @@ function renderScopeVariables(variables) {
     const tbody = table.createTBody();
     variables.forEach(v => {
         const row = tbody.insertRow();
-        [v.name, v.type, v.value].forEach(val => {
+        [v.name, v.type, v.value].forEach((col, idx) => {
             const td = row.insertCell();
-            td.textContent = val;
-            td.addEventListener("click", async () => {
-                inspectVariable(v.name, td.textContent);
-            });
+            td.textContent = col;
+            if (idx == 2) {
+                td.style.cursor = "pointer";
+                td.classList.add("var-value");
+                td.addEventListener("click", async () => {
+                    const scopeVars = inspectVariable(v.name, v.value);
+                    if (scopeVars.length <= 0) {
+                        td.classList.add("copied");
+
+                        if (td.varValueTimeout != null) {
+                            clearTimeout(td.varValueTimeout);
+                        }
+                        td.varValueTimeout = setTimeout(() => {
+                            td.classList.remove("copied");
+                        }, 1000);
+
+                        await navigator.clipboard.writeText(v.value);
+                        window.showMessage(true, `Copied value of ${v.name} to clipboard`);
+                    }
+                });
+            }
         });
     });
 
@@ -410,9 +436,8 @@ function processVariableString(str) {
 function inspectVariable(variableName, variableString) {
     const scopeVars = processVariableString(variableString);
     if (scopeVars.length <= 0) {
-        return;
+        return scopeVars;
     }
-
 
     const container = document.createElement("div");
     container.id = "inspectVariables";
@@ -451,4 +476,6 @@ function inspectVariable(variableName, variableString) {
         }
     });
     document.documentElement.appendChild(overlay);
+
+    return scopeVars;
 }

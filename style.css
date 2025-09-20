@@ -418,8 +418,11 @@ body {
     z-index: 10;
 }
 
-#scopeVariables td:hover {
+#scopeVariables td.var-value:hover {
     background-color: var(--color-bg-hover);
+}
+#scopeVariables td.var-value.copied {
+    color: var(--color-accent-green-hover)
 }
 
 #codeExamples {
