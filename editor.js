@@ -40,7 +40,7 @@ async function loadAllExamples() {
         button.addEventListener("click", async () => {
             if (window.editor && e.code) {
                 window.editor.setValue(e.code);
-                window.breakpoints = {};
+                cleanBreakpoints();
                 window.showMessage(true, `Loaded example: ${e.title}`);
                 window.toggleInfoSection();
             }
@@ -56,7 +56,7 @@ async function loadExample(example) {
 }
 loadAllExamples();
 
-const breakpoints = {};
+let breakpoints = {};
 window.getBreakpointValues = () => {
     return Object.values(breakpoints).filter(bp => bp != null);
 }
@@ -176,6 +176,13 @@ const setDecorations = () => {
     );
 };
 window.setDecorations = setDecorations;
+
+function cleanBreakpoints() {
+    breakpoints = {};
+    window.breakpoints = breakpoints;
+    setDecorations();
+    setYaegiBreakpoints(getBreakpointLineNumbers());
+}
 
 function encode(str) {
     return btoa(unescape(encodeURIComponent(str)));
