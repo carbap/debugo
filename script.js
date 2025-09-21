@@ -508,7 +508,20 @@ function inspectVariable(variablePath, variableString) {
         contentDiv.classList.add("contentDiv");
         contentDiv.appendChild(contentSpan);
         contentDiv.addEventListener("click", async () => {
-            inspectVariable(path, v.value);
+            const scopeVars = inspectVariable(path, v.value);
+            if (scopeVars.length <= 0) {
+                contentDiv.classList.add("copied");
+
+                if (contentDiv.varValueTimeout != null) {
+                    clearTimeout(contentDiv.varValueTimeout);
+                }
+                contentDiv.varValueTimeout = setTimeout(() => {
+                    contentDiv.classList.remove("copied");
+                }, 1000);
+
+                await navigator.clipboard.writeText(v.value);
+                window.showMessage(true, `Copied value to clipboard`);
+            }
         });
 
         const row = document.createElement("div");

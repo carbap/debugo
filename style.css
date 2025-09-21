@@ -356,7 +356,7 @@ body {
     bottom: 0;
     height: 16px;
     width: 100%;
-    z-index: 13;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -449,7 +449,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 9998;
+    z-index: 9990;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
@@ -507,6 +507,10 @@ body {
     padding-bottom: 10px;
     width: 100%;
     cursor: pointer;
+}
+.variableFrame-row div.contentDiv.copied {
+    border-bottom: 1px solid var(--color-accent-green-hover);
+    color: var(--color-accent-green-hover)
 }
 .variableFrame-row div.contentDiv:hover {
     background-color: var(--color-bg-hover);
