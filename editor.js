@@ -40,6 +40,7 @@ async function loadAllExamples() {
         button.addEventListener("click", async () => {
             if (window.editor && e.code) {
                 window.editor.setValue(e.code);
+                window.breakpoints = {};
                 window.showMessage(true, `Loaded example: ${e.title}`);
                 window.toggleInfoSection();
             }
