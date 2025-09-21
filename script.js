@@ -11,9 +11,6 @@ const checkResult = (result) => {
 const go = new Go(); // from wasm_exec.js
 let mod, inst;
 
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-const baseURL = isLocal ? "http://localhost:8000/" : "https://go-in-browser.vercel.app/";
-
 const runBtn = document.getElementById("runBtn");
 const debugBtn = document.getElementById("debugBtn");
 const continueBtn = document.getElementById("continueBtn");
@@ -347,7 +344,7 @@ function renderScopeVariables(variables) {
 shareBtn.addEventListener("click", async () => {
     try {
         const encoded = window.base64UrlEncode(window.editor.getValue());
-        const link = `${baseURL}#${encoded}`;
+        const link = `${window.location.href}#${encoded}`;
         await navigator.clipboard.writeText(link);
         window.showMessage(true, "Copied link to clipboard");
     } catch (err) {
