@@ -438,14 +438,14 @@ const breadcrumb = [];
 const LIST_TYPE_ARRAY = 0;
 const LIST_TYPE_OBJ = 1;
 
-function inspectVariable(variableName, variableString) {
+function inspectVariable(variablePath, variableString) {
     const scopeVars = processVariableString(variableString);
     if (scopeVars.length <= 0) {
         return scopeVars;
     }
     let listType = variableString[0] == OPEN_SQUARE ? LIST_TYPE_ARRAY : LIST_TYPE_OBJ;
 
-    breadcrumb.push(variableName);
+    breadcrumb.push(variablePath);
 
     const container = document.createElement("div");
     container.id = "inspectVariables";
@@ -463,24 +463,40 @@ function inspectVariable(variableName, variableString) {
     frame.appendChild(header);
 
     scopeVars.forEach((v, i) => {
-        const rowSpan = document.createElement("span");
-        rowSpan.textContent = v.value;
+        let title = `${i}:`;
+        let path = `[${i}]`;
+        let content = v.value;
+        if (listType == LIST_TYPE_OBJ) {
+            const colonIndex = v.value.indexOf(":");
+            title = v.value.substring(0, colonIndex + 1);
+            content = v.value.substring(colonIndex + 1).trim();
+            if (title.includes('"')) {
+                path = `[${title}]`;
+            } else {
+                path = `.${title}`;
+            }
+        }
+
+        const titleSpan = document.createElement("span");
+        titleSpan.classList.add("titleSpan");
+        titleSpan.textContent = title;
+
+
+        const contentSpan = document.createElement("span");
+        contentSpan.classList.add("contentSpan");
+        contentSpan.textContent = content;
+
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("contentDiv");
+        contentDiv.appendChild(contentSpan);
+        contentDiv.addEventListener("click", async () => {
+            inspectVariable(path, v.value);
+        });
 
         const row = document.createElement("div");
         row.classList.add("variableFrame-row");
-        row.appendChild(rowSpan);
-        row.addEventListener("click", async () => {
-            let path = `[${i}]`;
-            if (listType == LIST_TYPE_OBJ) {
-                const firstPart = v.value.substring(0, v.value.indexOf(":"));
-                if (firstPart.includes('"')) {
-                    path = `[${firstPart}]`;
-                } else {
-                    path = `.${firstPart}`;
-                }
-            }
-            inspectVariable(path, v.value);
-        });
+        row.appendChild(titleSpan);
+        row.appendChild(contentDiv);
 
         frame.appendChild(row);
     });
