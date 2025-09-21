@@ -461,6 +461,9 @@ function inspectVariable(variableName, variableString) {
         const row = document.createElement("div");
         row.classList.add("variableFrame-row");
         row.appendChild(rowSpan);
+        row.addEventListener("click", async () => {
+            inspectVariable(v.value, v.value);
+        });
 
         frame.appendChild(row);
     });
