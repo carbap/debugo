@@ -433,11 +433,19 @@ function processVariableString(str) {
     return scopeVars;
 }
 
+const breadcrumb = [];
+
+const LIST_TYPE_ARRAY = 0;
+const LIST_TYPE_OBJ = 1;
+
 function inspectVariable(variableName, variableString) {
     const scopeVars = processVariableString(variableString);
     if (scopeVars.length <= 0) {
         return scopeVars;
     }
+    let listType = variableString[0] == OPEN_SQUARE ? LIST_TYPE_ARRAY : LIST_TYPE_OBJ;
+
+    breadcrumb.push(variableName);
 
     const container = document.createElement("div");
     container.id = "inspectVariables";
@@ -446,7 +454,7 @@ function inspectVariable(variableName, variableString) {
     frame.classList.add("variableFrame");
 
     const headerSpan = document.createElement("span");
-    headerSpan.textContent = variableName;
+    headerSpan.textContent = breadcrumb.join("");
 
     const header = document.createElement("div");
     header.classList.add("variableFrame-header");
@@ -462,7 +470,16 @@ function inspectVariable(variableName, variableString) {
         row.classList.add("variableFrame-row");
         row.appendChild(rowSpan);
         row.addEventListener("click", async () => {
-            inspectVariable(v.value, v.value);
+            let path = `[${i}]`;
+            if (listType == LIST_TYPE_OBJ) {
+                const firstPart = v.value.substring(0, v.value.indexOf(":"));
+                if (firstPart.includes('"')) {
+                    path = `[${firstPart}]`;
+                } else {
+                    path = `.${firstPart}`;
+                }
+            }
+            inspectVariable(path, v.value);
         });
 
         frame.appendChild(row);
@@ -476,6 +493,7 @@ function inspectVariable(variableName, variableString) {
     overlay.addEventListener("click", (e) => {
         if (!container.contains(e.target)) {
             overlay.remove();
+            breadcrumb.pop();
         }
     });
     document.documentElement.appendChild(overlay);
