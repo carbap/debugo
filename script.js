@@ -376,9 +376,9 @@ class ScopeVar {
     }
 }
 
-const OPEN_CURLY   = '{';
-const CLOSE_CURLY  = '}';
-const OPEN_SQUARE  = '[';
+const OPEN_CURLY = '{';
+const CLOSE_CURLY = '}';
+const OPEN_SQUARE = '[';
 const CLOSE_SQUARE = ']';
 const COMMA = ',';
 const QUOTE = '"';
@@ -438,12 +438,30 @@ const breadcrumb = [];
 const LIST_TYPE_ARRAY = 0;
 const LIST_TYPE_OBJ = 1;
 
+function getListType(variableString) {
+    if (variableString[0] === OPEN_SQUARE) {
+        return LIST_TYPE_ARRAY;
+    } else if (variableString[0] === OPEN_CURLY) {
+        return LIST_TYPE_OBJ;
+    } else {
+        const squareIndex = variableString.indexOf(OPEN_SQUARE);
+        const curlyIndex = variableString.indexOf(OPEN_CURLY);
+        if (squareIndex === -1 && curlyIndex === -1) {
+            return LIST_TYPE_ARRAY;
+        } else if (squareIndex !== -1 && (curlyIndex === -1 || squareIndex < curlyIndex)) {
+            return LIST_TYPE_ARRAY;
+        } else {
+            return LIST_TYPE_OBJ;
+        }
+    }
+}
+
 function inspectVariable(variablePath, variableString) {
     const scopeVars = processVariableString(variableString);
     if (scopeVars.length <= 0) {
         return scopeVars;
     }
-    let listType = variableString[0] == OPEN_SQUARE ? LIST_TYPE_ARRAY : LIST_TYPE_OBJ;
+    let listType = getListType(variableString);
 
     breadcrumb.push(variablePath);
 
@@ -468,19 +486,19 @@ function inspectVariable(variablePath, variableString) {
         let content = v.value;
         if (listType == LIST_TYPE_OBJ) {
             const colonIndex = v.value.indexOf(":");
-            title = v.value.substring(0, colonIndex + 1);
+            const firstPart = v.value.substring(0, colonIndex);
+            title = `${firstPart}:`;
             content = v.value.substring(colonIndex + 1).trim();
-            if (title.includes('"')) {
-                path = `[${title}]`;
+            if (firstPart.includes('"')) {
+                path = `[${firstPart}]`;
             } else {
-                path = `.${title}`;
+                path = `.${firstPart}`;
             }
         }
 
         const titleSpan = document.createElement("span");
         titleSpan.classList.add("titleSpan");
         titleSpan.textContent = title;
-
 
         const contentSpan = document.createElement("span");
         contentSpan.classList.add("contentSpan");

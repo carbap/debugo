@@ -199,22 +199,25 @@ body {
 
 @media (max-width: 600px) {
     #topContainer h1 {
-        display: none;
+        display: none !important;
     }
-    #scopeVariables {
-        font-size: 14px;
+    #output,
+    #scopeVariables,
+    .variableFrame-header span,
+    .variableFrame-row span {
+        font-size: 14px !important;
     }
 }
 @media (max-width: 380px) {
     #topContainer .executionBtn {
-        font-size: 0;
-        gap: 0;
+        font-size: 0 !important;
+        gap: 0 !important;
     }
-    #output {
-        font-size: 14px;
-    }
-    #scopeVariables {
-        font-size: 12px;
+    #output,
+    #scopeVariables,
+    .variableFrame-header span,
+    .variableFrame-row span {
+        font-size: 12px !important;
     }
 }
 
@@ -466,7 +469,7 @@ body {
     color: var(--color-text-bright);
     min-height: 100%;
 }
-.variableFrame-header span, .variableFrame-row span {
+.variableFrame-header span, .variableFrame-row div.contentDiv {
     overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

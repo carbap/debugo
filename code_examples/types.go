@@ -27,8 +27,8 @@ func main() {
 
 	s1 := Person{"Alice", 30}
 	s2 := struct {
-		language string
-		year     int
+		Language string
+		Year     int
 	}{"Go", 2009}
 
 	ptr := &a
@@ -43,17 +43,17 @@ func main() {
 
 	var if1 interface{}
 	if1 = a
-	if1 = map[string]interface{}{"b": b, "c": c}
+	if1 = map[string]interface{}{"b": b, "c": c, "e": e, "f": f}
 	var if2 any
 	if2 = d
-	if2 = map[string]any{"e": e, "f": f}
+	if2 = map[string]any{"s1": s1, "s2": s2, "m1": m1, "m2": m2}
 
 	c64 := complex64(1 + 2i)
 	c128 := complex128(2 + 3i)
 
 	type Var struct {
-		name  string
-		value any
+		Name  string
+		Value any
 	}
 	variables := []Var{
 		{"a", a},
@@ -83,7 +83,7 @@ func main() {
 	}
 
 	for _, v := range variables {
-		fmt.Printf("%s (%T): %v\n", v.name, v.value, v.value)
+		fmt.Printf("%s (%T): %v\n", v.Name, v.Value, v.Value)
 	}
 
 	fmt.Println("--- Done! ---")
