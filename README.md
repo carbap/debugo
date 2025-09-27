@@ -9,6 +9,7 @@
   - Click or tap a value to either copy it to the clipboard or expand it (for objects, lists, and maps).
 - **Share your code** – Generate a shareable link that loads your code into the editor.
 - **Code examples** – Choose from a list of presets to get started.
+- **Select Go version** – Pick the Yaegi release that matches the Go version you want to use.
 
 ## 🎥 Demo
 
