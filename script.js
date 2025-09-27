@@ -87,8 +87,14 @@ debugScope.addEventListener("click", async () => {
     selectScope();
 });
 
-async function initWasm() {
-    const resp = await fetch("yaegi.wasm");
+const VERSIONS = [
+    { yaegi: "0.16.1", go: "Go 1.21 and 1.22" },
+    { yaegi: "0.15.1", go: "Go 1.18 and 1.19" },
+    { yaegi: "0.13.0", go: "Go 1.16 and 1.17" },
+];
+
+async function initWasm(version) {
+    const resp = await fetch(`wasm/yaegi-${version}.wasm`);
     const buf = await resp.arrayBuffer();
     const result = await WebAssembly.instantiate(buf, go.importObject);
     mod = result.module;
@@ -98,10 +104,10 @@ async function initWasm() {
     go.run(inst);
 
     reset();
-    console.log("Yaegi ready");
+    console.log(`Yaegi ${version} ready`);
 }
 
-initWasm();
+initWasm(VERSIONS[0].yaegi);
 
 runBtn.addEventListener("click", async () => {
     const code = window.editor.getValue();
