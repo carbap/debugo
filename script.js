@@ -31,6 +31,8 @@ let isInfoSectionOpened = false;
 const shareBtn = document.getElementById("shareBtn");
 let shareBtnTimeout = null;
 
+const pickVersionBtn = document.getElementById("pickVersionBtn");
+
 const scopeVariables = document.getElementById("scopeVariables");
 
 function reset() {
@@ -94,7 +96,8 @@ const VERSIONS = [
 ];
 
 async function initWasm(version) {
-    const resp = await fetch(`wasm/yaegi-${version}.wasm`);
+    pickVersionBtn.textContent = "Loading ...";
+    const resp = await fetch(`wasm/yaegi-${version.yaegi}.wasm`);
     const buf = await resp.arrayBuffer();
     const result = await WebAssembly.instantiate(buf, go.importObject);
     mod = result.module;
@@ -104,10 +107,11 @@ async function initWasm(version) {
     go.run(inst);
 
     reset();
-    console.log(`Yaegi ${version} ready`);
+    pickVersionBtn.textContent = formatVersionName(version);
+    console.log(`Yaegi ${version.yaegi} is ready`);
 }
 
-initWasm(VERSIONS[0].yaegi);
+initWasm(VERSIONS[0]);
 
 runBtn.addEventListener("click", async () => {
     const code = window.editor.getValue();
@@ -475,16 +479,16 @@ function inspectVariable(variablePath, variableString) {
     breadcrumb.push(variablePath);
 
     const container = document.createElement("div");
-    container.id = "inspectVariables";
+    container.classList.add("modalContainer");
 
     const frame = document.createElement("div");
-    frame.classList.add("variableFrame");
+    frame.classList.add("modalFrame");
 
     const headerSpan = document.createElement("span");
     headerSpan.textContent = breadcrumb.join("");
 
     const header = document.createElement("div");
-    header.classList.add("variableFrame-header");
+    header.classList.add("modalFrame-header");
     header.appendChild(headerSpan);
 
     frame.appendChild(header);
@@ -534,7 +538,7 @@ function inspectVariable(variablePath, variableString) {
         });
 
         const row = document.createElement("div");
-        row.classList.add("variableFrame-row");
+        row.classList.add("modalFrame-row");
         row.appendChild(titleSpan);
         row.appendChild(contentDiv);
 
@@ -544,7 +548,7 @@ function inspectVariable(variablePath, variableString) {
     container.appendChild(frame);
 
     const overlay = document.createElement("div");
-    overlay.id = "inspectVariablesOverlay";
+    overlay.classList.add("modalOverlay");
     overlay.appendChild(container);
     overlay.addEventListener("click", (e) => {
         if (!container.contains(e.target)) {
@@ -556,3 +560,76 @@ function inspectVariable(variablePath, variableString) {
 
     return scopeVars;
 }
+
+function pickVersion() {
+    const container = document.createElement("div");
+    container.classList.add("modalContainer");
+
+    const removeOverlay = (e) => {
+        if (e == null) {
+            overlay.remove();
+        } else if (!container.contains(e.target)) {
+            overlay.remove();
+        }
+    };
+
+    const overlay = document.createElement("div");
+    overlay.classList.add("modalOverlay");
+    overlay.appendChild(container);
+    overlay.addEventListener("click", (e) => {
+        removeOverlay(e);
+    });
+
+    const frame = document.createElement("div");
+    frame.classList.add("modalFrame");
+
+    const headerSpan = document.createElement("span");
+    headerSpan.textContent = "Select Go version";
+
+    const header = document.createElement("div");
+    header.classList.add("modalFrame-header");
+    header.appendChild(headerSpan);
+
+    frame.appendChild(header);
+
+    VERSIONS.forEach((version, i) => {
+        let title = `Yaegi ${version.yaegi}:`;
+        let content = version.go;
+
+        const titleSpan = document.createElement("span");
+        titleSpan.classList.add("titleSpan");
+        titleSpan.textContent = title;
+
+        const contentSpan = document.createElement("span");
+        contentSpan.classList.add("contentSpan");
+        contentSpan.textContent = content;
+
+        const contentDiv = document.createElement("div");
+        contentDiv.classList.add("contentDiv");
+        contentDiv.appendChild(contentSpan);
+        contentDiv.addEventListener("click", async () => {
+            removeOverlay();
+            await initWasm(version);
+            window.showMessage(true, `Loaded ${formatVersionName(version)}`);
+        });
+
+        const row = document.createElement("div");
+        row.classList.add("modalFrame-row");
+        row.appendChild(titleSpan);
+        row.appendChild(contentDiv);
+
+        frame.appendChild(row);
+    });
+
+    container.appendChild(frame);
+
+    document.documentElement.appendChild(overlay);
+}
+
+function formatVersionName(version) {
+    return `Yaegi ${version.yaegi} (${version.go})`;
+}
+
+pickVersionBtn.addEventListener("click", async () => {
+    pickVersion();
+});
