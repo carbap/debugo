@@ -1,5 +1,5 @@
-module go-in-browser
+module debugo
 
-go 1.24.5
+go 1.25.1
 
-require github.com/traefik/yaegi v0.16.1 // indirect
+require github.com/traefik/yaegi v0.16.1

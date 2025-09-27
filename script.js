@@ -1,11 +1,13 @@
 
 
 const checkResult = (result) => {
-    if (result?.error != "") {
-        console.log(result.error);
-        return false;
+    let errMsg = null;
+    if (result == null) {
+        errMsg = "panic";
+    } else if (result.error != "") {
+        errMsg = result.error;
     }
-    return true;
+    return { valid: errMsg == null, errMsg: errMsg };
 }
 
 const go = new Go(); // from wasm_exec.js
@@ -107,15 +109,17 @@ runBtn.addEventListener("click", async () => {
     let content = null;
     try {
         const result = runYaegi(code);
-        if (!checkResult(result)) {
-            content = result.error;
+        const { valid, errMsg } = checkResult(result);
+        if (!valid) {
+            content = errMsg;
             showErrorStatus();
         } else {
             content = result.output;
             showSuccessStatus();
         }
     } catch (ex) {
-        content = ex
+        content = ex;
+        showErrorStatus();
     }
     output.textContent = content;
 });
@@ -195,16 +199,18 @@ debugBtn.addEventListener("click", () => {
     setDebug();
     const code = window.editor.getValue();
     const result = startYaegiDebug(code, window.getBreakpointLineNumbers());
-    if (!checkResult(result)) {
-        output.textContent += result.error;
+    const { valid, errMsg } = checkResult(result);
+    if (!valid) {
+        output.textContent += errMsg;
         showErrorStatus();
     }
 });
 
 continueBtn.addEventListener("click", () => {
     const result = continueYaegiDebug();
-    if (!checkResult(result)) {
-        output.textContent += result.error;
+    const { valid, errMsg } = checkResult(result);
+    if (!valid) {
+        output.textContent += errMsg;
     }
 });
 
